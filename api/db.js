@@ -1,0 +1,41 @@
+import mysql from 'mysql2/promise';
+
+let pool;
+
+function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      uri: process.env.DATABASE_URL || undefined,
+      host: process.env.DATABASE_URL ? undefined : process.env.DB_HOST,
+      port: process.env.DATABASE_URL ? undefined : Number(process.env.DB_PORT || 3306),
+      user: process.env.DATABASE_URL ? undefined : process.env.DB_USER,
+      password: process.env.DATABASE_URL ? undefined : process.env.DB_PASSWORD,
+      database: process.env.DATABASE_URL ? undefined : (process.env.DB_NAME || 'nourish_net_db'),
+      waitForConnections: true,
+      connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 3),
+      namedPlaceholders: true,
+      decimalNumbers: true,
+      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
+    });
+  }
+  return pool;
+}
+
+export function db() {
+  return getPool();
+}
+
+export async function withTransaction(work) {
+  const connection = await getPool().getConnection();
+  try {
+    await connection.beginTransaction();
+    const result = await work(connection);
+    await connection.commit();
+    return result;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
