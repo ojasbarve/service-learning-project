@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { AlertTriangle, MapPin, Filter, PackageOpen } from 'lucide-react';
+import { AlertTriangle, Filter, MapPin, PackageOpen } from 'lucide-react';
 import SurplusCard from '../../components/ui/SurplusCard';
 import { useApp } from '../../context/AppContext';
 import { format } from 'date-fns';
 
-const filterOptions = ['All', 'Cooked Meal', 'Bakery', 'Expiring Soon'];
-const sortOptions = ['Expiring Soonest', 'Quantity (High→Low)'];
+const filterOptions = ['All', 'Cooked meal', 'Bakery', 'Expiring soon'];
+const sortOptions = ['Expiring soonest', 'Quantity: high to low'];
 
 export default function AvailableSurplus() {
   const { listings, claimListing, currentUser, loading } = useApp();
   const [activeFilter, setActiveFilter] = useState('All');
-  const [sort, setSort] = useState('Expiring Soonest');
+  const [sort, setSort] = useState('Expiring soonest');
   const [claimingId, setClaimingId] = useState(null);
   const [actionError, setActionError] = useState('');
 
@@ -22,95 +22,81 @@ export default function AvailableSurplus() {
   });
 
   let displayed = [...available];
-
-  if (activeFilter === 'Cooked Meal') {
+  if (activeFilter === 'Cooked meal') {
     displayed = displayed.filter(l => ['Mixed Meal', 'Biryani', 'Dal/Curry', 'Full Thali', 'Cooked Rice'].includes(l.foodType));
   } else if (activeFilter === 'Bakery') {
-    displayed = displayed.filter(l => l.foodType === 'Bread/Roti' || l.foodType === 'Bakery Items');
-  } else if (activeFilter === 'Expiring Soon') {
+    displayed = displayed.filter(l => ['Bread/Roti', 'Bakery Items'].includes(l.foodType));
+  } else if (activeFilter === 'Expiring soon') {
     displayed = displayed.filter(l => {
       const diff = new Date(l.deadline) - now;
       return diff > 0 && diff < 2 * 60 * 60 * 1000;
     });
   }
 
-  if (sort === 'Expiring Soonest') {
-    displayed = [...displayed].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-  } else {
-    displayed = [...displayed].sort((a, b) => b.quantity - a.quantity);
-  }
+  displayed.sort((a, b) => sort === 'Expiring soonest'
+    ? new Date(a.deadline) - new Date(b.deadline)
+    : b.quantity - a.quantity);
 
   async function handleAccept(listing) {
-    // If logged in as volunteer, use their ID; else use v1 as default
-    const volId = currentUser?.role === 'volunteer' ? currentUser.volunteerId : 'v1';
-    setClaimingId(listing.id); setActionError('');
-    try { await claimListing(listing.id, volId); }
+    const volunteerId = currentUser?.role === 'volunteer' ? currentUser.volunteerId : 'v1';
+    setClaimingId(listing.id);
+    setActionError('');
+    try { await claimListing(listing.id, volunteerId); }
     catch (error) { setActionError(error.message); }
     finally { setClaimingId(null); }
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto' }}>
-      {actionError && <div role="alert" style={{ marginBottom: 16, padding: '12px 14px', borderRadius: 12, background: '#fff4f1', color: '#a43b22', fontSize: '.85rem', fontWeight: 600 }}>{actionError}</div>}
-      {loading && <div style={{ marginBottom: 16, color: '#747985', fontSize: '.85rem' }}>Refreshing live listings…</div>}
-      {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em', flex: 1 }}>
-          Available Surplus
-        </h1>
-        <div style={{ background: '#F7F7F8', border: '1px solid #E5E5E5', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8125rem', color: '#6B6B6B', fontWeight: 500 }}>
-          {format(now, 'EEEE, MMMM d, yyyy')}
+    <div className="volunteer-queue">
+      <header className="queue-header">
+        <div>
+          <p className="queue-kicker">Volunteer queue</p>
+          <h1>Available surplus</h1>
+          <p className="queue-intro">Choose a pickup you can complete before the deadline.</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: '#F7F7F8', border: '1px solid #E5E5E5', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8125rem', color: '#6B6B6B', fontWeight: 500 }}>
-          <MapPin size={13} />
-          Pune
+        <div className="queue-meta">
+          <span>{format(now, 'EEEE, MMMM d, yyyy')}</span>
+          <span><MapPin size={14} /> Pune</span>
         </div>
-      </div>
+      </header>
 
-      {/* Urgent strip */}
+      {actionError && <div role="alert" className="queue-error">{actionError}</div>}
+      {loading && <div className="queue-loading">Refreshing the pickup queue…</div>}
+
       {urgent.length > 0 && (
-        <div style={{ background: '#FFFBEB', border: '1px solid #F59E0B', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#92400E', fontWeight: 500, fontSize: '0.9rem' }}>
-          <AlertTriangle size={18} style={{ color: '#F59E0B', flexShrink: 0 }} />
-          <span><strong>{urgent.length} listing{urgent.length > 1 ? 's' : ''}</strong> expire{urgent.length === 1 ? 's' : ''} in under 2 hours — act now to avoid food waste</span>
+        <div className="queue-alert">
+          <AlertTriangle size={17} />
+          <span><strong>{urgent.length} pickup{urgent.length > 1 ? 's' : ''}</strong> close{urgent.length === 1 ? 's' : ''} in the next two hours.</span>
         </div>
       )}
 
-      {/* Filter row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        <Filter size={15} style={{ color: '#9B9B9B' }} />
-        {filterOptions.map(opt => (
-          <button key={opt} onClick={() => setActiveFilter(opt)}
-            style={{
-              background: activeFilter === opt ? '#FF5C28' : '#F7F7F8',
-              color: activeFilter === opt ? '#FFFFFF' : '#6B6B6B',
-              border: `1px solid ${activeFilter === opt ? '#FF5C28' : '#E5E5E5'}`,
-              borderRadius: '20px', padding: '5px 14px',
-              fontSize: '0.8125rem', fontWeight: 500, cursor: 'pointer',
-              transition: 'all 150ms ease', fontFamily: 'inherit',
-            }}
-          >{opt}</button>
-        ))}
-        <div style={{ marginLeft: 'auto' }}>
-          <select value={sort} onChange={e => setSort(e.target.value)}
-            style={{ height: 34, border: '1px solid #E5E5E5', borderRadius: '8px', padding: '0 10px', fontSize: '0.8125rem', color: '#6B6B6B', background: '#FFFFFF', cursor: 'pointer', fontFamily: 'inherit' }}>
-            {sortOptions.map(o => <option key={o}>{o}</option>)}
-          </select>
-        </div>
-      </div>
-
-      {/* Cards grid */}
-      {displayed.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '64px', color: '#9B9B9B', background: '#FFFFFF', borderRadius: '10px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-          <PackageOpen size={34} style={{ marginBottom: 12, color: '#f15b35' }} />
-          <div style={{ fontWeight: 600, color: '#6B6B6B', marginBottom: '6px' }}>No listings match this filter</div>
-          <div style={{ fontSize: '0.875rem' }}>Try switching to "All" to see everything available</div>
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          {displayed.map(l => (
-            <SurplusCard key={l.id} listing={l} onAccept={handleAccept} disabled={claimingId === l.id} />
+      <div className="queue-toolbar">
+        <div className="queue-filters" role="group" aria-label="Filter surplus">
+          <Filter size={15} />
+          {filterOptions.map(option => (
+            <button key={option} className={activeFilter === option ? 'active' : ''} onClick={() => setActiveFilter(option)}>
+              {option}
+            </button>
           ))}
         </div>
+        <label className="queue-sort">
+          <span>Sort</span>
+          <select value={sort} onChange={event => setSort(event.target.value)}>
+            {sortOptions.map(option => <option key={option}>{option}</option>)}
+          </select>
+        </label>
+      </div>
+
+      <div className="queue-summary"><strong>{displayed.length}</strong> pickup{displayed.length === 1 ? '' : 's'} available</div>
+
+      {displayed.length === 0 ? (
+        <div className="queue-empty">
+          <PackageOpen size={30} />
+          <strong>No pickups match this filter</strong>
+          <span>Try “All” to see the complete queue.</span>
+        </div>
+      ) : (
+        <div className="surplus-list">{displayed.map(listing => <SurplusCard key={listing.id} listing={listing} onAccept={handleAccept} disabled={claimingId === listing.id} />)}</div>
       )}
     </div>
   );
