@@ -4,6 +4,55 @@ import { matchingSpot } from './utils.js';
 
 const listingSelect = `SELECT l.*, s.name supplier_name, s.area supplier_area, s.type supplier_type, v.short_name volunteer_name FROM surplus_listings l JOIN suppliers s ON s.id=l.supplier_id LEFT JOIN volunteers v ON v.id=l.volunteer_id`;
 
+function distance(a, b) {
+  const lat = Number(a.lat) - Number(b.lat);
+  const lng = Number(a.lng) - Number(b.lng);
+  return (lat * lat) + (lng * lng);
+}
+
+async function optimizePendingRoute(connection, volunteerId) {
+  const [rows] = await connection.query(
+    'SELECT * FROM route_stops WHERE volunteer_id=:volunteerId ORDER BY sequence_order FOR UPDATE',
+    { volunteerId },
+  );
+  const completed = rows.filter(stop => stop.status === 'Completed');
+  const pending = rows.filter(stop => stop.status !== 'Completed');
+  const pairs = new Map();
+  for (const stop of pending) {
+    if (!stop.listing_id) continue;
+    if (!pairs.has(stop.listing_id)) pairs.set(stop.listing_id, []);
+    pairs.get(stop.listing_id).push(stop);
+  }
+  const ordered = [];
+  let cursor = completed[completed.length - 1] || pending[0];
+  while (pairs.size) {
+    let nextId;
+    let nextPair;
+    for (const [listingId, pair] of pairs) {
+      const pickup = pair.find(stop => stop.type === 'pickup');
+      if (!pickup) continue;
+      if (!nextPair || distance(cursor || pickup, pickup) < distance(cursor || pickup, nextPair.find(stop => stop.type === 'pickup'))) {
+        nextId = listingId;
+        nextPair = pair;
+      }
+    }
+    if (!nextPair) break;
+    pairs.delete(nextId);
+    const pickup = nextPair.find(stop => stop.type === 'pickup');
+    const drop = nextPair.find(stop => stop.type === 'drop');
+    if (pickup) ordered.push(pickup);
+    if (drop) ordered.push(drop);
+    cursor = drop || pickup || cursor;
+  }
+  const finalOrder = [...completed, ...ordered, ...pending.filter(stop => !stop.listing_id)];
+  for (let i = 0; i < finalOrder.length; i += 1) {
+    await connection.query('UPDATE route_stops SET sequence_order=:nextOrder WHERE id=:id', { nextOrder: 200 + i, id: finalOrder[i].id });
+  }
+  for (let i = 0; i < finalOrder.length; i += 1) {
+    await connection.query('UPDATE route_stops SET sequence_order=:nextOrder WHERE id=:id', { nextOrder: i + 1, id: finalOrder[i].id });
+  }
+}
+
 async function listListings(req, res) {
   const where = [];
   const params = {};
@@ -62,6 +111,7 @@ async function claimListing(req, res, listingId) {
       category: listing.supplier_type, pickupName: listing.supplier_name, area: listing.supplier_area, detail, address: listing.address, pickupLat: listing.lat, pickupLng: listing.lng, pickupOrder: start,
       dropCategory: spot.type, dropName: spot.name, dropArea: spot.area, dropDetail: `${Math.round(Number(listing.quantity_kg) * 2.5)} meal packets`, dropAddress: `${spot.name}, ${spot.area}`, dropLat: spot.lat, dropLng: spot.lng, dropOrder: start + 1,
     });
+    await optimizePendingRoute(connection, volunteerId);
     const [updated] = await connection.query(`${listingSelect} WHERE l.id=:id`, { id: listingId });
     return { status: 200, body: { listing: normalizeListing(updated[0]), volunteer: normalizeVolunteer({ ...volunteer, status: 'En Route', last_update: 'Just now' }), route: [] } };
   });
