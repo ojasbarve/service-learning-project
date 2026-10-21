@@ -1,7 +1,7 @@
 import { useApp } from '../../context/AppContext';
 import Badge from '../../components/ui/Badge';
 import { format } from 'date-fns';
-import { CheckCircle, Package, TrendingUp } from 'lucide-react';
+import { CheckCircle, ClipboardList, Package, TrendingUp } from 'lucide-react';
 
 import { useState } from 'react';
 
@@ -17,7 +17,7 @@ export default function DistributionLog() {
   if (!isOps && !isVolunteer) {
     return (
       <div style={{ maxWidth: 600, margin: '60px auto', textAlign: 'center', padding: '48px', background: '#FFFFFF', borderRadius: '10px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>📦</div>
+        <ClipboardList size={38} style={{ marginBottom: 16, color: '#f15b35' }} />
         <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0A0A0A', marginBottom: '8px' }}>Distribution Log View</h2>
         <p style={{ color: '#9B9B9B', fontSize: '0.9rem' }}>You are logged in as a Supplier. Switch to a <strong>Volunteer</strong> or <strong>Sevadeep Ops</strong> in the sidebar to inspect delivery logs.</p>
       </div>
@@ -106,7 +106,7 @@ export default function DistributionLog() {
         </div>
         {completed.length === 0 ? (
           <div style={{ padding: '64px', textAlign: 'center', color: '#9B9B9B' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📋</div>
+            <ClipboardList size={32} style={{ marginBottom: 12, color: '#f15b35' }} />
             <div style={{ fontWeight: 600, color: '#6B6B6B', marginBottom: '6px' }}>No completed deliveries yet</div>
             <div style={{ fontSize: '0.875rem' }}>Accept a pickup from Available Surplus to get started</div>
           </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Info, PlusCircle } from 'lucide-react';
+import { Bike, Info, PlusCircle } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
 import StatCard from '../../components/ui/StatCard';
 import { useApp } from '../../context/AppContext';
@@ -385,7 +385,7 @@ export default function LogSurplus() {
                     </td>
                     <td style={{ ...tdStyle, fontSize: '0.875rem', color: '#6B6B6B' }}>
                       {l.volunteerAssigned ? (
-                        <span style={{ fontWeight: 600, color: '#0070F3' }}>🚴 {l.volunteerAssigned}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontWeight: 600, color: '#0070F3' }}><Bike size={14} /> {l.volunteerAssigned}</span>
                       ) : (
                         <span style={{ color: '#9B9B9B' }}>Waiting for pickup</span>
                       )}

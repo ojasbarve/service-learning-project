@@ -90,21 +90,21 @@ export const weekForecast = [
 
 // ─── Upcoming Surge Events ─────────────────────────────────────────────────────
 export const upcomingEvents = [
-  { id: 'e1', icon: '🎊', title: 'Navratri Community Feast — Laxmi Road', date: 'Oct 2, 2026', expectedSurplus: '+200 kg', alertBy: 'Sep 30', type: 'Festival', recurring: false },
-  { id: 'e2', icon: '🍽', title: 'IT Park Canteen Clearance — Hinjewadi', date: 'Every Friday 7:00 PM', expectedSurplus: '+80 kg', alertBy: null, type: 'Recurring', recurring: true },
-  { id: 'e3', icon: '💒', title: 'Wedding Season Peak', date: 'Oct 15 – 30, 2026', expectedSurplus: '+400 kg over 2 weeks', alertBy: 'Oct 12', type: 'Seasonal', recurring: false },
+  { id: 'e1', icon: 'festival', title: 'Navratri Community Feast — Laxmi Road', date: 'Oct 2, 2026', expectedSurplus: '+200 kg', alertBy: 'Sep 30', type: 'Festival', recurring: false },
+  { id: 'e2', icon: 'meal', title: 'IT Park Canteen Clearance — Hinjewadi', date: 'Every Friday 7:00 PM', expectedSurplus: '+80 kg', alertBy: null, type: 'Recurring', recurring: true },
+  { id: 'e3', icon: 'season', title: 'Wedding Season Peak', date: 'Oct 15 – 30, 2026', expectedSurplus: '+400 kg over 2 weeks', alertBy: 'Oct 12', type: 'Seasonal', recurring: false },
 ];
 
 // ─── Designated Delivery Spots (Hospitals & Community Shelters) ────────────────
 export const deliverySpots = [
-  { id: 'd1', name: 'Sassoon General Hospital Relief Center', type: 'Public Hospital', area: 'Station Road', lat: 18.5264, lng: 73.8732, description: 'Destitute patient & family meal counter', icon: '🏥', contact: 'Dr. Kulkarni', phone: '+91-20-2612-8000' },
-  { id: 'd2', name: 'KEM Hospital Patient Attendant Hub', type: 'Public Hospital', area: 'Rasta Peth', lat: 18.5208, lng: 73.8682, description: 'Evening patient attendants meal distribution', icon: '🏥', contact: 'Sister Mary', phone: '+91-20-6603-7300' },
-  { id: 'd3', name: 'Bharati Hospital Community Kitchen', type: 'Public Hospital', area: 'Dhankawadi / Katraj', lat: 18.4575, lng: 73.8508, description: 'Free meal counter for patient relatives', icon: '🏥', contact: 'Sunil Rao', phone: '+91-20-2437-3226' },
-  { id: 'd4', name: 'Sancheti Relief Center', type: 'Public Hospital', area: 'Shivajinagar', lat: 18.5302, lng: 73.8502, description: 'Daily noon and night hot meals', icon: '🏥', contact: 'Anil K.', phone: '+91-20-2899-9999' },
-  { id: 'd5', name: 'Ekta Nagar Construction Camp', type: 'Community Shelter', area: 'Hinjewadi', lat: 18.5870, lng: 73.7430, description: 'Migrant construction workers cluster', icon: '⛺', contact: 'Manoj Yadav', phone: '+91-98765-43210' },
-  { id: 'd6', name: 'Yerwada Resettlement Colony', type: 'Community Shelter', area: 'Yerwada', lat: 18.5494, lng: 73.9078, description: 'Underprivileged families daily distribution', icon: '⛺', contact: 'Rehana Shaikh', phone: '+91-99887-11223' },
-  { id: 'd7', name: 'Tadiwala Road Community Center', type: 'Community Shelter', area: 'Tadiwala Road', lat: 18.5166, lng: 73.8699, description: 'Evening community dinner distribution', icon: '⛺', contact: 'Ganesh Shinde', phone: '+91-98223-99881' },
-  { id: 'd8', name: 'Koregaon Park Migrant Labor Site', type: 'Community Shelter', area: 'Mundhwa', lat: 18.5420, lng: 73.8970, description: 'Daily dinner packet drop zone', icon: '⛺', contact: 'Vijay K.', phone: '+91-98440-22119' },
+  { id: 'd1', name: 'Sassoon General Hospital Relief Center', type: 'Public Hospital', area: 'Station Road', lat: 18.5264, lng: 73.8732, description: 'Destitute patient & family meal counter', icon: 'hospital', contact: 'Dr. Kulkarni', phone: '+91-20-2612-8000' },
+  { id: 'd2', name: 'KEM Hospital Patient Attendant Hub', type: 'Public Hospital', area: 'Rasta Peth', lat: 18.5208, lng: 73.8682, description: 'Evening patient attendants meal distribution', icon: 'hospital', contact: 'Sister Mary', phone: '+91-20-6603-7300' },
+  { id: 'd3', name: 'Bharati Hospital Community Kitchen', type: 'Public Hospital', area: 'Dhankawadi / Katraj', lat: 18.4575, lng: 73.8508, description: 'Free meal counter for patient relatives', icon: 'hospital', contact: 'Sunil Rao', phone: '+91-20-2437-3226' },
+  { id: 'd4', name: 'Sancheti Relief Center', type: 'Public Hospital', area: 'Shivajinagar', lat: 18.5302, lng: 73.8502, description: 'Daily noon and night hot meals', icon: 'hospital', contact: 'Anil K.', phone: '+91-20-2899-9999' },
+  { id: 'd5', name: 'Ekta Nagar Construction Camp', type: 'Community Shelter', area: 'Hinjewadi', lat: 18.5870, lng: 73.7430, description: 'Migrant construction workers cluster', icon: 'shelter', contact: 'Manoj Yadav', phone: '+91-98765-43210' },
+  { id: 'd6', name: 'Yerwada Resettlement Colony', type: 'Community Shelter', area: 'Yerwada', lat: 18.5494, lng: 73.9078, description: 'Underprivileged families daily distribution', icon: 'shelter', contact: 'Rehana Shaikh', phone: '+91-99887-11223' },
+  { id: 'd7', name: 'Tadiwala Road Community Center', type: 'Community Shelter', area: 'Tadiwala Road', lat: 18.5166, lng: 73.8699, description: 'Evening community dinner distribution', icon: 'shelter', contact: 'Ganesh Shinde', phone: '+91-98223-99881' },
+  { id: 'd8', name: 'Koregaon Park Migrant Labor Site', type: 'Community Shelter', area: 'Mundhwa', lat: 18.5420, lng: 73.8970, description: 'Daily dinner packet drop zone', icon: 'shelter', contact: 'Vijay K.', phone: '+91-98440-22119' },
 ];
 
 // Helper to find a suitable delivery spot for a given area

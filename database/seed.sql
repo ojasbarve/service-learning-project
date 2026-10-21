@@ -33,14 +33,14 @@ VALUES
 INSERT INTO delivery_spots
   (id, name, type, area, lat, lng, description, icon, contact_person, phone)
 VALUES
-  ('d1', 'Sassoon General Hospital Relief Center', 'Public Hospital', 'Station Road', 18.526400, 73.873200, 'Destitute patient & family meal counter', '🏥', 'Dr. Kulkarni', '+91-20-2612-8000'),
-  ('d2', 'KEM Hospital Patient Attendant Hub', 'Public Hospital', 'Rasta Peth', 18.520800, 73.868200, 'Evening patient attendants meal distribution', '🏥', 'Sister Mary', '+91-20-6603-7300'),
-  ('d3', 'Bharati Hospital Community Kitchen', 'Public Hospital', 'Dhankawadi / Katraj', 18.457500, 73.850800, 'Free meal counter for patient relatives', '🏥', 'Sunil Rao', '+91-20-2437-3226'),
-  ('d4', 'Sancheti Relief Center', 'Public Hospital', 'Shivajinagar', 18.530200, 73.850200, 'Daily noon and night hot meals', '🏥', 'Anil K.', '+91-20-2899-9999'),
-  ('d5', 'Ekta Nagar Construction Camp', 'Community Shelter', 'Hinjewadi', 18.587000, 73.743000, 'Migrant construction workers cluster', '⛺', 'Manoj Yadav', '+91-98765-43210'),
-  ('d6', 'Yerwada Resettlement Colony', 'Community Shelter', 'Yerwada', 18.549400, 73.907800, 'Underprivileged families daily distribution', '⛺', 'Rehana Shaikh', '+91-99887-11223'),
-  ('d7', 'Tadiwala Road Community Center', 'Community Shelter', 'Tadiwala Road', 18.516600, 73.869900, 'Evening community dinner distribution', '⛺', 'Ganesh Shinde', '+91-98223-99881'),
-  ('d8', 'Koregaon Park Migrant Labor Site', 'Community Shelter', 'Mundhwa', 18.542000, 73.897000, 'Daily dinner packet drop zone', '⛺', 'Vijay K.', '+91-98440-22119');
+  ('d1', 'Sassoon General Hospital Relief Center', 'Public Hospital', 'Station Road', 18.526400, 73.873200, 'Destitute patient & family meal counter', 'hospital', 'Dr. Kulkarni', '+91-20-2612-8000'),
+  ('d2', 'KEM Hospital Patient Attendant Hub', 'Public Hospital', 'Rasta Peth', 18.520800, 73.868200, 'Evening patient attendants meal distribution', 'hospital', 'Sister Mary', '+91-20-6603-7300'),
+  ('d3', 'Bharati Hospital Community Kitchen', 'Public Hospital', 'Dhankawadi / Katraj', 18.457500, 73.850800, 'Free meal counter for patient relatives', 'hospital', 'Sunil Rao', '+91-20-2437-3226'),
+  ('d4', 'Sancheti Relief Center', 'Public Hospital', 'Shivajinagar', 18.530200, 73.850200, 'Daily noon and night hot meals', 'hospital', 'Anil K.', '+91-20-2899-9999'),
+  ('d5', 'Ekta Nagar Construction Camp', 'Community Shelter', 'Hinjewadi', 18.587000, 73.743000, 'Migrant construction workers cluster', 'shelter', 'Manoj Yadav', '+91-98765-43210'),
+  ('d6', 'Yerwada Resettlement Colony', 'Community Shelter', 'Yerwada', 18.549400, 73.907800, 'Underprivileged families daily distribution', 'shelter', 'Rehana Shaikh', '+91-99887-11223'),
+  ('d7', 'Tadiwala Road Community Center', 'Community Shelter', 'Tadiwala Road', 18.516600, 73.869900, 'Evening community dinner distribution', 'shelter', 'Ganesh Shinde', '+91-98223-99881'),
+  ('d8', 'Koregaon Park Migrant Labor Site', 'Community Shelter', 'Mundhwa', 18.542000, 73.897000, 'Daily dinner packet drop zone', 'shelter', 'Vijay K.', '+91-98440-22119');
 
 INSERT INTO surplus_listings
   (id, supplier_id, food_type, quantity_kg, listed_at, deadline, address, lat, lng, status, volunteer_id, notes)
@@ -100,8 +100,8 @@ VALUES
 INSERT INTO surge_events
   (id, icon, title, date_str, expected_surplus, alert_by, type, recurring)
 VALUES
-  ('e1', '🎊', 'Navratri Community Feast — Laxmi Road', 'Oct 2, 2026', '+200 kg', 'Sep 30', 'Festival', FALSE),
-  ('e2', '🍽', 'IT Park Canteen Clearance — Hinjewadi', 'Every Friday 7:00 PM', '+80 kg', NULL, 'Recurring', TRUE),
-  ('e3', '💒', 'Wedding Season Peak', 'Oct 15 – 30, 2026', '+400 kg over 2 weeks', 'Oct 12', 'Seasonal', FALSE);
+  ('e1', 'festival', 'Navratri Community Feast — Laxmi Road', 'Oct 2, 2026', '+200 kg', 'Sep 30', 'Festival', FALSE),
+  ('e2', 'meal', 'IT Park Canteen Clearance — Hinjewadi', 'Every Friday 7:00 PM', '+80 kg', NULL, 'Recurring', TRUE),
+  ('e3', 'season', 'Wedding Season Peak', 'Oct 15 – 30, 2026', '+400 kg over 2 weeks', 'Oct 12', 'Seasonal', FALSE);
 
 COMMIT;

@@ -300,7 +300,7 @@ export default function OpsProfiles() {
                       justifyContent: 'center',
                       fontSize: '1.2rem',
                     }}>
-                      🚴
+                      <Bike size={19} />
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#111827' }}>
@@ -370,7 +370,7 @@ export default function OpsProfiles() {
                         fontFamily: 'inherit',
                       }}
                     >
-                      Inspect Route ({vStops.length} stops) →
+                      Inspect Route ({vStops.length} stops)
                     </button>
                   </div>
                 </div>

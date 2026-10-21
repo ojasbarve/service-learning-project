@@ -10,15 +10,15 @@ function makeStopIcon(type, category = '') {
   const isHospital = (category || '').toLowerCase().includes('hospital');
 
   let bg = '#00A67E';
-  let emoji = '📦';
+  let marker = 'P';
 
   if (!isPickup) {
     if (isHospital) {
       bg = '#0284C7';
-      emoji = '🏥';
+      marker = 'H';
     } else {
       bg = '#EA580C';
-      emoji = '⛺';
+      marker = 'S';
     }
   }
 
@@ -29,8 +29,8 @@ function makeStopIcon(type, category = '') {
       background:${bg};border:3px solid #fff;
       box-shadow:0 3px 6px rgba(0,0,0,0.25);
       display:flex;align-items:center;justify-content:center;
-      font-size:14px;line-height:1;
-    ">${emoji}</div>`,
+      font-size:11px;line-height:1;font-weight:800;color:#fff;
+    ">${marker}</div>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
   });
@@ -179,7 +179,7 @@ export default function OpsVolunteerRoutes() {
                 fontSize: '1.3rem',
                 fontWeight: 700,
               }}>
-                🚴
+                <span className="route-avatar-monogram">{selectedVol.name.split(' ').map(part => part[0]).join('').slice(0, 2)}</span>
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -292,7 +292,7 @@ export default function OpsVolunteerRoutes() {
                             background: isPickup ? '#ECFDF5' : isHospital ? '#E0F2FE' : '#FFEDD5',
                             color: isPickup ? '#047857' : isHospital ? '#0369A1' : '#C2410C',
                           }}>
-                            {isPickup ? '📦 PICKUP SPOT' : isHospital ? '🏥 HOSPITAL DELIVERY' : '⛺ SHELTER DELIVERY'}
+                            {isPickup ? 'PICKUP SPOT' : isHospital ? 'HOSPITAL DELIVERY' : 'SHELTER DELIVERY'}
                             <span>· #{idx + 1}</span>
                           </div>
                           <div style={{ fontWeight: 700, fontSize: '0.925rem', color: '#111827' }}>
@@ -335,15 +335,15 @@ export default function OpsVolunteerRoutes() {
                   Marker Legend
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151' }}>
-                  <span>📦</span>
+              <span className="map-legend-letter">P</span>
                   <span><strong>Pickup:</strong> Hotel / Cafeteria</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151' }}>
-                  <span>🏥</span>
+              <span className="map-legend-letter">H</span>
                   <span><strong>Delivery:</strong> Hospital Relief Hub</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151' }}>
-                  <span>⛺</span>
+              <span className="map-legend-letter">S</span>
                   <span><strong>Delivery:</strong> Community Shelter</span>
                 </div>
               </div>

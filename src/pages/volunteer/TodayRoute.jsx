@@ -19,15 +19,15 @@ function makeStopIcon(type, category = '') {
   const isHospital = (category || '').toLowerCase().includes('hospital');
 
   let bg = '#00A67E'; // green for pickup
-  let emoji = '📦';
+  let marker = 'P';
 
   if (!isPickup) {
     if (isHospital) {
       bg = '#0284C7'; // sky blue for hospital
-      emoji = '🏥';
+      marker = 'H';
     } else {
       bg = '#EA580C'; // amber-orange for shelter/camp
-      emoji = '⛺';
+      marker = 'S';
     }
   }
 
@@ -38,8 +38,8 @@ function makeStopIcon(type, category = '') {
       background:${bg};border:3px solid #fff;
       box-shadow:0 3px 8px rgba(0,0,0,0.3);
       display:flex;align-items:center;justify-content:center;
-      font-size:15px;line-height:1;
-    ">${emoji}</div>`,
+      font-size:11px;line-height:1;font-weight:800;color:#fff;
+    ">${marker}</div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 16],
   });
@@ -141,7 +141,7 @@ export default function TodayRoute() {
                 Sequential Stop Timeline
               </div>
               <div style={{ fontSize: '0.8rem', color: '#9B9B9B', marginTop: '2px' }}>
-                {pickupCount} Pickup{pickupCount !== 1 ? 's' : ''} → {dropCount} Delivery Drop{dropCount !== 1 ? 's' : ''}
+                {pickupCount} Pickup{pickupCount !== 1 ? 's' : ''} / {dropCount} Delivery Drop{dropCount !== 1 ? 's' : ''}
               </div>
             </div>
             <span style={{
@@ -206,19 +206,19 @@ export default function TodayRoute() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#00A67E', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px' }}>📦</span>
+                <span className="map-legend-letter" style={{ background: '#00A67E' }}>P</span>
                 <span style={{ fontWeight: 600, color: '#065F46' }}>Pickup Spot:</span>
                 <span style={{ color: '#6B7280' }}>Hotels, Cafeterias, College Canteens, Bakeries</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#0284C7', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px' }}>🏥</span>
+                <span className="map-legend-letter" style={{ background: '#0284C7' }}>H</span>
                 <span style={{ fontWeight: 600, color: '#0369A1' }}>Delivery Spot (Hospital):</span>
                 <span style={{ color: '#6B7280' }}>Sassoon Hospital, KEM, Bharati, Sancheti</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#EA580C', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '10px' }}>⛺</span>
+                <span className="map-legend-letter" style={{ background: '#EA580C' }}>S</span>
                 <span style={{ fontWeight: 600, color: '#C2410C' }}>Delivery Spot (Shelter):</span>
                 <span style={{ color: '#6B7280' }}>Ekta Nagar, Yerwada Colony, Migrant Sites</span>
               </div>
@@ -305,7 +305,7 @@ export default function TodayRoute() {
                         background: isPickup ? '#ECFDF5' : isHospital ? '#E0F2FE' : '#FFEDD5',
                         color: isPickup ? '#047857' : isHospital ? '#0369A1' : '#C2410C',
                       }}>
-                        {isPickup ? '📦 PICKUP SPOT' : isHospital ? '🏥 HOSPITAL DELIVERY' : '⛺ SHELTER DELIVERY'}
+                        {isPickup ? 'PICKUP SPOT' : isHospital ? 'HOSPITAL DELIVERY' : 'SHELTER DELIVERY'}
                         <span>· Stop #{idx + 1}</span>
                       </div>
                       <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0A0A0A' }}>
@@ -348,15 +348,15 @@ export default function TodayRoute() {
               Map Stop Types
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151' }}>
-              <span style={{ color: '#00A67E', fontWeight: 'bold' }}>📦</span>
+              <span className="map-legend-letter" style={{ background: '#00A67E' }}>P</span>
               <span>Pickup (Hotels & Cafeterias)</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151' }}>
-              <span style={{ color: '#0284C7', fontWeight: 'bold' }}>🏥</span>
+              <span className="map-legend-letter" style={{ background: '#0284C7' }}>H</span>
               <span>Delivery: Public Hospitals</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#374151' }}>
-              <span style={{ color: '#EA580C', fontWeight: 'bold' }}>⛺</span>
+              <span className="map-legend-letter" style={{ background: '#EA580C' }}>S</span>
               <span>Delivery: Shelters & Camps</span>
             </div>
           </div>

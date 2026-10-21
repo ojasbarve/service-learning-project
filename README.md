@@ -1,11 +1,11 @@
-# 🍱 Nourish.Net (formerly Pune Plate)
+# Nourish.Net (formerly Pune Plate)
 
 > **Real-time food surplus coordination platform built for Sevadeep NGO, Pune.**  
 > Built as part of the Service Learning Project — TY CS B, Symbiosis Institute of Technology, Pune.
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 **Nourish.Net** connects food donors (hotels, corporate cafeterias, college canteens, wedding banquet halls, dhabas, bakeries) with **Sevadeep NGO**'s volunteer distribution network in Pune. 
 
@@ -13,20 +13,20 @@ It replaces unstructured WhatsApp communication with a structured, role-based, r
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 🏪 1. Supplier Portal (`/supplier`)
+### 1. Supplier Portal (`/supplier`)
 - **Log Surplus (`/supplier/log`)**: Simple form to log surplus meals (quantity in kg, food type, deadline, dietary notes). New listings reflect immediately across volunteer and ops views.
 - **My History (`/supplier/history`)**: Log of all past food donations and completion statuses.
 - **My Profile (`/supplier/profile`)**: Donor profile with impact statistics (lifetime kg donated, meals enabled) and recent activity.
 
-### 🚴 2. Volunteer Portal (`/volunteer`)
+### 2. Volunteer Portal (`/volunteer`)
 - **Available Surplus (`/volunteer/available`)**: Real-time listing queue with countdown urgency timers. Claiming an order updates status across the platform.
-- **Today's Route (`/volunteer/route`)**: Sequential stop timeline and interactive Leaflet map showing pickup locations (green 📦) and paired delivery drop points (hospitals 🏥 & community shelters ⛺).
+- **Today's Route (`/volunteer/route`)**: Sequential stop timeline and interactive Leaflet map showing pickup locations and paired delivery drop points.
 - **AI Demand Forecast (`/volunteer/forecast`)**: Predictive demand charts across Pune sectors and upcoming surge event alerts.
 - **Distribution Log (`/volunteer/log`)**: Detailed log of completed pickups, deliveries, and delivery performance metrics.
 
-### 🏢 3. Sevadeep Ops Command Center (`/ops`)
+### 3. Sevadeep Ops Command Center (`/ops`)
 - **Overview (`/ops/overview`)**: High-level command center with live citywide logistics map, key performance indicators (KPIs), area-wise breakdown, and active dispatch status.
 - **Volunteer Route Inspector (`/ops/routes`)**: Dedicated interface to inspect and audit routes for each volunteer separately with individual turn-by-turn timelines and maps.
 - **Supply Network Map (`/ops/map`)**: Full-screen GIS map of 26+ donor partner locations categorized across IT parks, wedding halls, restaurants, canteens, bakeries, and dhabas.
@@ -36,7 +36,7 @@ It replaces unstructured WhatsApp communication with a structured, role-based, r
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend Framework:** React 18
 - **Build Tool:** Vite
@@ -49,7 +49,7 @@ It replaces unstructured WhatsApp communication with a structured, role-based, r
 
 ---
 
-## 💻 Getting Started
+## Getting Started
 
 ### Prerequisites
 Make sure you have [Node.js](https://nodejs.org/) installed (v18 or higher recommended).
@@ -119,7 +119,7 @@ The current role switcher is intentionally a demo authentication mode. Before pr
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 pune-plate/

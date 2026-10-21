@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, MapPin, Filter } from 'lucide-react';
+import { AlertTriangle, MapPin, Filter, PackageOpen } from 'lucide-react';
 import SurplusCard from '../../components/ui/SurplusCard';
 import { useApp } from '../../context/AppContext';
 import { format } from 'date-fns';
@@ -101,7 +101,7 @@ export default function AvailableSurplus() {
       {/* Cards grid */}
       {displayed.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '64px', color: '#9B9B9B', background: '#FFFFFF', borderRadius: '10px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🍱</div>
+          <PackageOpen size={34} style={{ marginBottom: 12, color: '#f15b35' }} />
           <div style={{ fontWeight: 600, color: '#6B6B6B', marginBottom: '6px' }}>No listings match this filter</div>
           <div style={{ fontSize: '0.875rem' }}>Try switching to "All" to see everything available</div>
         </div>

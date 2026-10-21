@@ -3,12 +3,12 @@ import { useApp } from '../../context/AppContext';
 import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
 import { format } from 'date-fns';
-import { MapPin, Phone, User, Award, Calendar } from 'lucide-react';
+import { Building2, MapPin, Phone, User, Award, Calendar } from 'lucide-react';
 
 export default function SupplierProfile() {
   const { currentUser, listings, suppliers } = useApp();
   const [selectedSupplierId, setSelectedSupplierId] = useState(
-    currentUser?.supplierId || suppliers[0].id
+    currentUser?.supplierId || suppliers[0]?.id || ''
   );
 
   const isOps = currentUser?.role === 'ops';
@@ -17,7 +17,7 @@ export default function SupplierProfile() {
   if (!isOps && !isSupplier) {
     return (
       <div style={{ maxWidth: 600, margin: '60px auto', textAlign: 'center', padding: '48px', background: '#FFFFFF', borderRadius: '10px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>🏪</div>
+        <Building2 size={38} style={{ marginBottom: 16, color: '#f15b35' }} />
         <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#0A0A0A', marginBottom: '8px' }}>Supplier Profile View</h2>
         <p style={{ color: '#9B9B9B', fontSize: '0.9rem' }}>You are logged in as a Volunteer. Switch to a <strong>Supplier</strong> or <strong>Sevadeep Ops</strong> in the sidebar to inspect supplier profiles.</p>
       </div>
@@ -25,7 +25,7 @@ export default function SupplierProfile() {
   }
 
   const activeSupplierId = isSupplier ? currentUser.supplierId : selectedSupplierId;
-  const supplier = suppliers.find(s => s.id === activeSupplierId) || suppliers[0];
+  const supplier = suppliers.find(s => s.id === activeSupplierId) || suppliers[0] || { id: activeSupplierId, name: 'No supplier selected', area: 'Pune', totalDonated: 0 };
 
   const myListings = listings.filter(l => l.supplierId === supplier.id);
   const recentListings = [...myListings].sort((a, b) => new Date(b.listedAt) - new Date(a.listedAt)).slice(0, 6);

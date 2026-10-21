@@ -26,7 +26,7 @@ export default function UserSwitcher() {
           cursor: 'pointer', fontFamily: 'inherit', width: '100%',
         }}
       >
-        <span style={{ fontSize: '1.1rem' }}>{currentUser.avatar}</span>
+        <span className="user-avatar-monogram">{currentUser.avatar}</span>
         <div style={{ flex: 1, textAlign: 'left' }}>
           <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0A0A0A' }}>{currentUser.name}</div>
           <div style={{ fontSize: '0.7rem', color: rc.color, textTransform: 'capitalize', fontWeight: 500 }}>{currentUser.role}</div>
@@ -62,7 +62,7 @@ export default function UserSwitcher() {
                     borderBottom: '1px solid #F0F0F0',
                   }}
                 >
-                  <span>{u.avatar}</span>
+                  <span className="user-avatar-monogram user-avatar-monogram-small">{u.avatar}</span>
                   <span style={{ fontSize: '0.8125rem', fontWeight: currentUser.id === u.id ? 600 : 400, color: '#0A0A0A' }}>
                     {u.name}
                   </span>

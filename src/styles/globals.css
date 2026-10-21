@@ -22,6 +22,10 @@ html { font-size: 16px; scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--ink); line-height: 1.5; }
 body, button, input, select, textarea { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
 h1, h2, h3, h4, .app-wordmark { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: -0.045em; }
+.user-avatar-monogram { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border-radius: 9px; background: #1d2331; color: #fff; font-size: .62rem; font-weight: 800; letter-spacing: .02em; }
+.user-avatar-monogram-small { width: 24px; height: 24px; flex-basis: 24px; border-radius: 7px; font-size: .55rem; }
+.route-avatar-monogram { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: #fff0eb; color: #f15b35; font-size: .9rem; font-weight: 850; letter-spacing: .02em; }
+.map-legend-letter { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #1d2331; color: #fff; font-size: .6rem; font-weight: 800; }
 a,button { -webkit-tap-highlight-color: transparent; }
 button { transition: transform 180ms cubic-bezier(.2,.8,.2,1), background 180ms ease, color 180ms ease, box-shadow 180ms ease; }
 button:active { transform: scale(.975); }

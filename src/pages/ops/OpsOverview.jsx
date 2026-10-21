@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { CalendarDays } from 'lucide-react';
 import { upcomingEvents } from '../../data/mockData';
 import { useApp } from '../../context/AppContext';
 import StatCard from '../../components/ui/StatCard';
@@ -17,8 +18,8 @@ const hospitalDeliveryIcon = L.divIcon({
     background:#0284C7;border:3px solid #fff;
     box-shadow:0 2px 6px rgba(0,0,0,0.3);
     display:flex;align-items:center;justify-content:center;
-    font-size:13px;line-height:1;
-  ">🏥</div>`,
+    font-size:11px;line-height:1;font-weight:800;color:#fff;
+  ">H</div>`,
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
@@ -30,8 +31,8 @@ const shelterDeliveryIcon = L.divIcon({
     background:#EA580C;border:3px solid #fff;
     box-shadow:0 2px 6px rgba(0,0,0,0.3);
     display:flex;align-items:center;justify-content:center;
-    font-size:13px;line-height:1;
-  ">⛺</div>`,
+    font-size:11px;line-height:1;font-weight:800;color:#fff;
+  ">S</div>`,
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
@@ -194,7 +195,7 @@ export default function OpsOverview() {
                         color: isHospital ? '#0284C7' : '#EA580C',
                         marginBottom: '4px',
                       }}>
-                        {isHospital ? '🏥 PUBLIC HOSPITAL' : '⛺ COMMUNITY SHELTER'}
+                        {isHospital ? 'HOSPITAL DELIVERY' : 'SHELTER DELIVERY'}
                       </div>
                       <div style={{ fontWeight: 700, color: '#0A0A0A', marginBottom: '2px' }}>{d.name}</div>
                       <div style={{ color: '#6B6B6B', fontSize: '0.8rem', marginBottom: '4px' }}>
@@ -230,7 +231,7 @@ export default function OpsOverview() {
 
             {/* Donors */}
             <div style={{ fontWeight: 600, color: '#4B5563', fontSize: '0.7rem', marginBottom: '4px' }}>
-              📦 Pickups (Hotels & Cafeterias)
+              Pickups · Hotels & Cafeterias
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
               <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#00A67E', border: '1px solid #fff' }} />
@@ -250,11 +251,11 @@ export default function OpsOverview() {
               Beneficiary Delivery Hubs
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-              <span>🏥</span>
+              <span aria-hidden="true">H</span>
               <span style={{ color: '#0369A1', fontWeight: 600 }}>Public Hospitals (Sassoon, KEM)</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>⛺</span>
+              <span aria-hidden="true">S</span>
               <span style={{ color: '#C2410C', fontWeight: 600 }}>Community Shelters & Relief Camps</span>
             </div>
           </div>
@@ -363,7 +364,7 @@ export default function OpsOverview() {
               onMouseEnter={e => e.currentTarget.style.borderColor = '#CCCCCC'}
               onMouseLeave={e => e.currentTarget.style.borderColor = '#E5E5E5'}
             >
-              <div style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{ev.icon}</div>
+              <CalendarDays size={23} style={{ marginBottom: 8, color: '#f15b35' }} />
               <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#0A0A0A', lineHeight: 1.4, marginBottom: '6px' }}>
                 {ev.title}
               </div>
