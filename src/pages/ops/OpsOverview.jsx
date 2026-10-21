@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { CalendarDays, Sparkles, TriangleAlert } from 'lucide-react';
+import { CalendarDays, TriangleAlert } from 'lucide-react';
 import { upcomingEvents } from '../../data/mockData';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
@@ -139,12 +139,12 @@ export default function OpsOverview() {
 
       <section className="ops-ai-brief" aria-live="polite">
         <div className="ops-ai-brief-copy">
-          <div className="ops-ai-kicker"><Sparkles size={14} /> Optional local briefing</div>
-          <h2>Turn the live queue into a short action list.</h2>
-          <p>This uses a model running on your computer through Ollama. No listing data is sent to a hosted AI service.</p>
+          <div className="ops-ai-kicker">Local briefing</div>
+          <h2>Need a second view of the queue?</h2>
+          <p>Generate a short briefing on this computer. Your listing data stays local.</p>
         </div>
         <button className="ops-ai-button" onClick={generateBriefing} disabled={briefingLoading}>
-          <Sparkles size={16} /> {briefingLoading ? 'Preparing brief…' : 'Generate brief'}
+          {briefingLoading ? 'Preparing briefing…' : 'Generate briefing'}
         </button>
         {briefingError && <div className="ops-ai-error"><TriangleAlert size={15} /> {briefingError}</div>}
         {briefing && <div className="ops-ai-result"><strong>{briefing.headline}</strong><ul>{(briefing.priorities || []).map(priority => <li key={priority}>{priority}</li>)}</ul>{briefing.note && <p>{briefing.note}</p>}</div>}
