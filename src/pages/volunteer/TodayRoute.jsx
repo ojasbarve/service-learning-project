@@ -48,7 +48,7 @@ function makeStopIcon(type, category = '') {
 const puneCenter = [18.5204, 73.8567];
 
 export default function TodayRoute() {
-  const { currentUser, getVolunteerRoute, volunteers: liveVolunteers } = useApp();
+  const { currentUser, getVolunteerRoute, removeRouteStop, volunteers: liveVolunteers } = useApp();
 
   // If volunteer is logged in, show their route; if ops, allow selecting any volunteer
   const defaultVolId =
@@ -176,7 +176,10 @@ export default function TodayRoute() {
               No stops scheduled right now. Accept listings from Available Surplus to build your route.
             </div>
           ) : (
-            <RouteTimeline stops={stops} />
+            <RouteTimeline stops={stops} onRemove={async stop => {
+              if (!window.confirm(`Remove ${stop.name} from this route? Its paired delivery stop will also be removed.`)) return;
+              await removeRouteStop(stop.id);
+            }} />
           )}
 
           {/* Summary Box */}

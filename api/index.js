@@ -83,6 +83,35 @@ async function allRoutes(req, res) {
   return sendJson(res, 200, { routes });
 }
 
+async function removeRouteStop(req, res, stopId) {
+  const result = await withTransaction(async connection => {
+    const [rows] = await connection.query('SELECT * FROM route_stops WHERE id=:stopId FOR UPDATE', { stopId });
+    const stop = rows[0];
+    if (!stop) return { status: 404, body: { error: 'Route stop not found' } };
+    if (stop.status === 'Completed') return { status: 409, body: { error: 'Completed stops cannot be removed' } };
+
+    if (stop.listing_id) {
+      await connection.query('UPDATE surplus_listings SET status="Cancelled", volunteer_id=NULL WHERE id=:listingId AND status IN ("Assigned","Picked Up")', { listingId: stop.listing_id });
+      await connection.query('DELETE FROM route_stops WHERE listing_id=:listingId', { listingId: stop.listing_id });
+    } else {
+      await connection.query('DELETE FROM route_stops WHERE id=:stopId', { stopId });
+    }
+
+    const [remaining] = await connection.query('SELECT id FROM route_stops WHERE volunteer_id=:volunteerId ORDER BY sequence_order, id', { volunteerId: stop.volunteer_id });
+    for (let i = 0; i < remaining.length; i += 1) {
+      await connection.query('UPDATE route_stops SET sequence_order=:nextOrder WHERE id=:id', { nextOrder: 200 + i, id: remaining[i].id });
+    }
+    for (let i = 0; i < remaining.length; i += 1) {
+      await connection.query('UPDATE route_stops SET sequence_order=:nextOrder WHERE id=:id', { nextOrder: i + 1, id: remaining[i].id });
+    }
+
+    const [active] = await connection.query('SELECT COUNT(*) count FROM surplus_listings WHERE volunteer_id=:volunteerId AND status IN ("Assigned","Picked Up")', { volunteerId: stop.volunteer_id });
+    if (Number(active[0].count) === 0) await connection.query('UPDATE volunteers SET status="Available", last_update="Just now" WHERE id=:volunteerId', { volunteerId: stop.volunteer_id });
+    return { status: 200, body: { removed: true, listingId: stop.listing_id, volunteerId: stop.volunteer_id } };
+  });
+  return sendJson(res, result.status, result.body);
+}
+
 async function localOpsSummary(req, res) {
   if (process.env.OLLAMA_ENABLED !== 'true') return sendJson(res, 503, { error: 'Local AI is disabled. Set OLLAMA_ENABLED=true to enable it.' });
   const snapshot = req.body?.snapshot;
@@ -130,6 +159,7 @@ export default async function handler(req, res) {
       catch { return sendJson(res, 503, { ok: false, database: 'unavailable' }); }
     }
     if (resource === 'routes' && !id && req.method === 'GET') return allRoutes(req, res);
+    if (resource === 'routes' && id && req.method === 'DELETE') return removeRouteStop(req, res, id);
     if (resource === 'llm' && id === 'ops-summary' && req.method === 'POST') return localOpsSummary(req, res);
     if (resource === 'listings' && !id && req.method === 'GET') return listListings(req, res);
     if (resource === 'listings' && !id && req.method === 'POST') return createListing(req, res);

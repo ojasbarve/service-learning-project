@@ -1,6 +1,6 @@
-import { Truck, MapPin } from 'lucide-react';
+import { Truck, MapPin, X } from 'lucide-react';
 
-export default function RouteTimeline({ stops }) {
+export default function RouteTimeline({ stops, onRemove }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {stops.map((stop, i) => {
@@ -39,7 +39,7 @@ export default function RouteTimeline({ stops }) {
             </div>
 
             {/* Content */}
-            <div style={{ paddingBottom: isLast ? 0 : 16, paddingTop: 4 }}>
+            <div style={{ paddingBottom: isLast ? 0 : 16, paddingTop: 4, flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {isPickup
                   ? <Truck size={13} style={{ color: '#00A67E' }} />
@@ -62,6 +62,11 @@ export default function RouteTimeline({ stops }) {
                 {stop.area} · {stop.detail}
               </div>
             </div>
+            {onRemove && stop.status !== 'Completed' && (
+              <button type="button" onClick={() => onRemove(stop)} title="Remove this pickup and its delivery stop" style={{ alignSelf: 'flex-start', border: 0, background: 'transparent', color: '#9B9B9B', cursor: 'pointer', padding: 4 }}>
+                <X size={15} />
+              </button>
+            )}
           </div>
         );
       })}

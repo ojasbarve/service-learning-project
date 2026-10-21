@@ -46,13 +46,14 @@ export function AppProvider({ children }) {
   useEffect(() => { refresh(); const timer = setInterval(refresh, 30000); return () => clearInterval(timer); }, [refresh]);
 
   async function claimListing(listingId, volunteerId) { await api.claimListing(listingId, volunteerId); await refresh(); }
+  async function removeRouteStop(stopId) { const result = await api.removeRouteStop(stopId); await refresh(); return result; }
   async function addListing(listing) {
     const created = await api.createListing({ ...listing, quantity: listing.quantity, supplierId: listing.supplierId });
     await refresh(); return created;
   }
   function getVolunteerRoute(volunteerId) { return routes[volunteerId] || []; }
 
-  return <AppCtx.Provider value={{ currentUser, setCurrentUser, listings, volunteers, suppliers, deliverySpots, routes, loading, error, lastSyncedAt, refresh, claimListing, addListing, getVolunteerRoute }}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{ currentUser, setCurrentUser, listings, volunteers, suppliers, deliverySpots, routes, loading, error, lastSyncedAt, refresh, claimListing, addListing, removeRouteStop, getVolunteerRoute }}>{children}</AppCtx.Provider>;
 }
 
 export function useApp() { return useContext(AppCtx); }

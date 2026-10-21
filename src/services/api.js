@@ -29,6 +29,7 @@ export const api = {
   volunteers: () => request('/volunteers').then(body => asArray(body, 'volunteers')),
   volunteerRoute: id => request(`/volunteers/${id}/route`).then(body => asArray(body, 'route')),
   volunteerRoutes: () => request('/routes').then(body => body?.routes || {}),
+  removeRouteStop: id => request(`/routes/${id}`, { method: 'DELETE' }),
   suppliers: () => request('/suppliers').then(body => asArray(body, 'suppliers')),
   deliverySpots: () => request('/delivery-spots').then(body => asArray(body, 'deliverySpots')),
   overview: () => request('/ops/overview'),
