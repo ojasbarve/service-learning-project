@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/((?!api/|src/|node_modules/|@vite/|@react-refresh|assets/|favicon\\.svg|icons\\.svg).*)", "destination": "/" }
   ]
 }
