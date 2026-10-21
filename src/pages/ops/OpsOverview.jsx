@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -5,9 +6,10 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Sparkles, TriangleAlert } from 'lucide-react';
 import { upcomingEvents } from '../../data/mockData';
 import { useApp } from '../../context/AppContext';
+import { api } from '../../services/api';
 import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
 
@@ -98,9 +100,22 @@ const CustomTooltip = ({ active, payload }) => {
 
 export default function OpsOverview() {
   const { listings, volunteers, deliverySpots } = useApp();
+  const [briefing, setBriefing] = useState(null);
+  const [briefingLoading, setBriefingLoading] = useState(false);
+  const [briefingError, setBriefingError] = useState('');
   const liveListings = listings.filter(l => ['Available', 'Assigned'].includes(l.status));
   const totalKg = liveListings.reduce((s, l) => s + l.quantity, 0);
   const activeVols = volunteers.filter(v => v.status !== 'Offline').length;
+
+  async function generateBriefing() {
+    setBriefingLoading(true); setBriefingError('');
+    try {
+      const urgent = liveListings.filter(listing => new Date(listing.deadline) - Date.now() < 60 * 60 * 1000).map(({ id, foodType, quantity, supplierArea, deadline, status }) => ({ id, foodType, quantity, supplierArea, deadline, status }));
+      const result = await api.opsSummary({ activeListings: liveListings.length, totalKg, activeVolunteers: activeVols, totalVolunteers: volunteers.length, deliverySpots: deliverySpots.length, urgentListings: urgent, volunteerStatuses: volunteers.map(({ name, status, zone }) => ({ name, status, zone })) });
+      setBriefing(result.briefing);
+    } catch (error) { setBriefingError(error.message); }
+    finally { setBriefingLoading(false); }
+  }
 
   return (
     <div className="operations-page ops-overview-page" style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -121,6 +136,19 @@ export default function OpsOverview() {
         <StatCard number={Math.round(totalKg / 0.35).toLocaleString()} label="Estimated Meals" />
         <StatCard number={`${activeVols} / ${volunteers.length}`} label="Volunteers Active" />
       </div>
+
+      <section className="ops-ai-brief" aria-live="polite">
+        <div className="ops-ai-brief-copy">
+          <div className="ops-ai-kicker"><Sparkles size={14} /> Optional local briefing</div>
+          <h2>Turn the live queue into a short action list.</h2>
+          <p>This uses a model running on your computer through Ollama. No listing data is sent to a hosted AI service.</p>
+        </div>
+        <button className="ops-ai-button" onClick={generateBriefing} disabled={briefingLoading}>
+          <Sparkles size={16} /> {briefingLoading ? 'Preparing brief…' : 'Generate brief'}
+        </button>
+        {briefingError && <div className="ops-ai-error"><TriangleAlert size={15} /> {briefingError}</div>}
+        {briefing && <div className="ops-ai-result"><strong>{briefing.headline}</strong><ul>{(briefing.priorities || []).map(priority => <li key={priority}>{priority}</li>)}</ul>{briefing.note && <p>{briefing.note}</p>}</div>}
+      </section>
 
       {/* Live Surplus Map */}
       <div style={{

@@ -158,11 +158,13 @@ CREATE INDEX idx_suppliers_area ON suppliers (area);
 CREATE INDEX idx_volunteers_status_zone ON volunteers (status, zone);
 CREATE INDEX idx_delivery_spots_area ON delivery_spots (area);
 CREATE INDEX idx_listings_status_deadline ON surplus_listings (status, deadline);
+CREATE INDEX idx_listings_status_created ON surplus_listings (status, created_at);
 CREATE INDEX idx_listings_supplier ON surplus_listings (supplier_id);
 CREATE INDEX idx_listings_volunteer ON surplus_listings (volunteer_id);
 CREATE INDEX idx_route_stops_volunteer_order ON route_stops (volunteer_id, sequence_order);
 CREATE INDEX idx_route_stops_listing ON route_stops (listing_id);
 CREATE INDEX idx_route_stops_status ON route_stops (status);
+CREATE INDEX idx_route_stops_volunteer_status ON route_stops (volunteer_id, status, sequence_order);
 CREATE INDEX idx_distribution_zones_priority ON distribution_zones (priority);
 CREATE INDEX idx_surge_events_date ON surge_events (date_str);
 

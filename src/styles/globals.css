@@ -26,6 +26,16 @@ h1, h2, h3, h4, .app-wordmark { font-family: "Helvetica Neue", Helvetica, Arial,
 .user-avatar-monogram-small { width: 24px; height: 24px; flex-basis: 24px; border-radius: 7px; font-size: .55rem; }
 .route-avatar-monogram { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: #fff0eb; color: #f15b35; font-size: .9rem; font-weight: 850; letter-spacing: .02em; }
 .map-legend-letter { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #1d2331; color: #fff; font-size: .6rem; font-weight: 800; }
+.ops-ai-brief { display: grid; grid-template-columns: 1fr auto; gap: 16px 24px; align-items: center; margin-bottom: 24px; padding: 20px 22px; border: 1px solid rgba(241,91,53,.22); border-radius: 18px; background: linear-gradient(135deg, #fff8f5, #fff); }
+.ops-ai-kicker { display: flex; align-items: center; gap: 7px; color: #f15b35; font-size: .68rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.ops-ai-brief h2 { margin: 6px 0 4px; font-size: 1.05rem; }
+.ops-ai-brief p { margin: 0; color: #747985; font-size: .82rem; }
+.ops-ai-button { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 11px; padding: 11px 14px; background: #1d2331; color: #fff; cursor: pointer; font: inherit; font-size: .8rem; font-weight: 750; white-space: nowrap; }
+.ops-ai-button:disabled { cursor: wait; opacity: .6; }
+.ops-ai-error, .ops-ai-result { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 8px; padding-top: 14px; border-top: 1px solid rgba(29,35,49,.1); color: #a43b22; font-size: .8rem; }
+.ops-ai-result { display: block; color: #1d2331; }
+.ops-ai-result ul { margin: 8px 0 4px 18px; padding: 0; color: #505765; }
+.ops-ai-result p { margin-top: 8px; }
 a,button { -webkit-tap-highlight-color: transparent; }
 button { transition: transform 180ms cubic-bezier(.2,.8,.2,1), background 180ms ease, color 180ms ease, box-shadow 180ms ease; }
 button:active { transform: scale(.975); }
@@ -74,5 +84,7 @@ input,select,textarea { color: var(--ink); }
   .operations-page table { display: block; overflow-x: auto; white-space: nowrap; }
   .ops-route-layout { gap: 14px !important; }
   .ops-route-detail-grid { gap: 14px !important; }
+  .ops-ai-brief { grid-template-columns: 1fr; }
+  .ops-ai-button { justify-content: center; width: 100%; }
 }
 

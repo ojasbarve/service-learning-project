@@ -9,7 +9,9 @@ async function listListings(req, res) {
   const params = {};
   if (req.query.status) { where.push('l.status=:status'); params.status = req.query.status; }
   if (req.query.supplierId) { where.push('l.supplier_id=:supplierId'); params.supplierId = req.query.supplierId; }
-  const [rows] = await db().query(`${listingSelect} ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY l.created_at DESC`, params);
+  const requestedLimit = Number(req.query.limit || 100);
+  const limit = Number.isInteger(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 250) : 100;
+  const [rows] = await db().query(`${listingSelect} ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY l.created_at DESC LIMIT ${limit}`, params);
   return sendJson(res, 200, rows.map(normalizeListing));
 }
 
@@ -71,6 +73,49 @@ async function route(req, res, volunteerId) {
   return sendJson(res, 200, rows.map(normalizeStop));
 }
 
+async function allRoutes(req, res) {
+  const [rows] = await db().query('SELECT * FROM route_stops ORDER BY volunteer_id, sequence_order');
+  const routes = {};
+  for (const row of rows) {
+    if (!routes[row.volunteer_id]) routes[row.volunteer_id] = [];
+    routes[row.volunteer_id].push(normalizeStop(row));
+  }
+  return sendJson(res, 200, { routes });
+}
+
+async function localOpsSummary(req, res) {
+  if (process.env.OLLAMA_ENABLED !== 'true') return sendJson(res, 503, { error: 'Local AI is disabled. Set OLLAMA_ENABLED=true to enable it.' });
+  const snapshot = req.body?.snapshot;
+  if (!snapshot || typeof snapshot !== 'object') return badRequest(res, 'snapshot is required');
+  const baseUrl = (process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434').replace(/\/$/, '');
+  const model = process.env.OLLAMA_MODEL || 'gemma3:4b';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch(`${baseUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        stream: false,
+        format: 'json',
+        messages: [
+          { role: 'system', content: 'You are an operations assistant for a Pune food rescue NGO. Return concise, practical JSON with keys headline, priorities (array of strings), and note. Do not invent facts.' },
+          { role: 'user', content: `Review this live operations snapshot and identify the most important next actions:\n${JSON.stringify(snapshot).slice(0, 12000)}` },
+        ],
+      }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) return sendJson(res, 502, { error: body.error || 'Local AI request failed' });
+    let content = body.message?.content || '';
+    try { content = JSON.parse(content); } catch { content = { headline: 'Local briefing', priorities: [content], note: '' }; }
+    return sendJson(res, 200, { model, briefing: content });
+  } catch (error) {
+    return sendJson(res, 503, { error: error.name === 'AbortError' ? 'Local AI request timed out' : 'Local AI is unavailable. Start Ollama and ensure the selected model is installed.' });
+  } finally { clearTimeout(timeout); }
+}
+
 export default async function handler(req, res) {
   try {
     res.setHeader('Cache-Control', 'no-store');
@@ -84,6 +129,8 @@ export default async function handler(req, res) {
       try { await db().query('SELECT 1'); return sendJson(res, 200, { ok: true, database: 'connected' }); }
       catch { return sendJson(res, 503, { ok: false, database: 'unavailable' }); }
     }
+    if (resource === 'routes' && !id && req.method === 'GET') return allRoutes(req, res);
+    if (resource === 'llm' && id === 'ops-summary' && req.method === 'POST') return localOpsSummary(req, res);
     if (resource === 'listings' && !id && req.method === 'GET') return listListings(req, res);
     if (resource === 'listings' && !id && req.method === 'POST') return createListing(req, res);
     if (resource === 'listings' && id && action === 'claim' && req.method === 'POST') return claimListing(req, res, id);

@@ -17,7 +17,10 @@ Apply from the project root:
 ```bash
 mysql -u root < database/schema.sql
 mysql -u root nourish_net_db < database/seed.sql
+mysql -u root nourish_net_db < database/performance.sql
 ```
+
+The performance script is for an existing database and adds targeted indexes for the live listing queue and volunteer route reads. Run it once after seeding. Use `EXPLAIN` to verify query plans before adding further indexes.
 
 `schema.sql` is repeatable but rebuilds these tables, so it replaces existing data in this database. To remove the database completely:
 

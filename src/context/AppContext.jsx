@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { api } from '../services/api';
 import { suppliers as fallbackSuppliers, volunteers as fallbackVolunteers, surplusListings as fallbackListings, deliverySpots as fallbackDeliverySpots, initialVolunteerRoutes as fallbackRoutes } from '../data/mockData';
 
@@ -27,17 +27,20 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
+  const refreshInFlight = useRef(false);
 
   const refresh = useCallback(async () => {
+    if (refreshInFlight.current) return;
+    refreshInFlight.current = true;
     try {
       const [nextListings, nextVolunteers, nextSuppliers, nextSpots] = await Promise.all([
         api.listings(), api.volunteers(), api.suppliers(), api.deliverySpots(),
       ]);
       setListings(nextListings); setVolunteers(nextVolunteers); setSuppliers(nextSuppliers); setDeliverySpots(nextSpots);
-      const routeEntries = await Promise.all(nextVolunteers.map(async volunteer => [volunteer.id, await api.volunteerRoute(volunteer.id)]));
-      setRoutes(Object.fromEntries(routeEntries)); setError(''); setLastSyncedAt(new Date());
+      const nextRoutes = await api.volunteerRoutes();
+      setRoutes(nextRoutes); setError(''); setLastSyncedAt(new Date());
     } catch (err) { setError(err.message); }
-    finally { setLoading(false); }
+    finally { setLoading(false); refreshInFlight.current = false; }
   }, []);
 
   useEffect(() => { refresh(); const timer = setInterval(refresh, 30000); return () => clearInterval(timer); }, [refresh]);

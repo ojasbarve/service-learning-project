@@ -81,17 +81,30 @@ Make sure you have [Node.js](https://nodejs.org/) installed (v18 or higher recom
 The API is implemented as Vercel functions. Use Vercel's local runtime when you need database-backed routes:
 
 ```bash
-npx vercel dev
+npm run dev:api
 ```
 
 Create `.env` from `.env.example` and set a reachable MySQL `DATABASE_URL`. A local MySQL server works with `vercel dev`; it will not work after deployment because Vercel cannot reach your laptop's `localhost`.
+
+### Optional local AI briefing
+
+The Ops Overview includes an optional local briefing action backed by Ollama. It is disabled by default and sends the current operational snapshot only to your local Ollama server when enabled.
+
+```bash
+ollama pull gemma3:4b
+```
+
+Set `OLLAMA_ENABLED=true`, `OLLAMA_BASE_URL=http://127.0.0.1:11434`, and `OLLAMA_MODEL=gemma3:4b` in `.env`, then start `npm run dev:api`. This local integration is not available to a deployed Vercel function unless you provide a secured, reachable Ollama endpoint.
 
 ### Database setup
 
 ```bash
 mysql -u root -p < database/schema.sql
 mysql -u root -p nourish_net_db < database/seed.sql
+mysql -u root -p nourish_net_db < database/performance.sql
 ```
+
+`database/performance.sql` adds targeted indexes for the live listing queue and volunteer routes. It is intended to be run once on an existing database. Use `EXPLAIN` before adding more indexes because indexes speed reads but add write overhead.
 
 ### Deploy to Vercel
 

@@ -28,7 +28,9 @@ export const api = {
   claimListing: (id, volunteerId) => request(`/listings/${id}/claim`, { method: 'POST', body: JSON.stringify({ volunteerId }) }),
   volunteers: () => request('/volunteers').then(body => asArray(body, 'volunteers')),
   volunteerRoute: id => request(`/volunteers/${id}/route`).then(body => asArray(body, 'route')),
+  volunteerRoutes: () => request('/routes').then(body => body?.routes || {}),
   suppliers: () => request('/suppliers').then(body => asArray(body, 'suppliers')),
   deliverySpots: () => request('/delivery-spots').then(body => asArray(body, 'deliverySpots')),
   overview: () => request('/ops/overview'),
+  opsSummary: snapshot => request('/llm/ops-summary', { method: 'POST', body: JSON.stringify({ snapshot }) }),
 };
