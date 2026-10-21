@@ -2,7 +2,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, Legend,
 } from 'recharts';
-import { Cpu, TrendingUp } from 'lucide-react';
+import { BarChart3, TrendingUp } from 'lucide-react';
 import { distributionZones, weekForecast } from '../../data/mockData';
 
 const priorityColor = {
@@ -49,22 +49,22 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function DemandForecast() {
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto' }}>
+    <div className="forecast-page" style={{ maxWidth: 960, margin: '0 auto' }}>
       {/* Page header */}
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-          <Cpu size={18} style={{ color: '#FF5C28' }} />
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
-            Today's Distribution Forecast
+      <div className="forecast-header" style={{ marginBottom: '24px' }}>
+        <div className="forecast-title-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <BarChart3 size={18} style={{ color: '#FF5C28' }} />
+          <h1 className="forecast-title" style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
+            Distribution outlook
           </h1>
         </div>
         <p style={{ fontSize: '0.875rem', color: '#9B9B9B' }}>
-          Model factors: day of week, weather, local events, historical distribution data
+          Expected packet demand across Pune, based on recent distribution activity.
         </p>
       </div>
 
       {/* Summary card */}
-      <div style={{
+      <div className="forecast-summary" style={{
         background: '#FFFFFF',
         borderRadius: '10px',
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
@@ -79,7 +79,7 @@ export default function DemandForecast() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', fontWeight: 700, color: '#FF5C28', lineHeight: 1 }}>148</div>
           <div style={{ fontSize: '0.8125rem', color: '#9B9B9B', marginTop: '4px', fontWeight: 500 }}>
-            Recommended Packets
+            Packets needed today
           </div>
           <div style={{
             marginTop: '8px',
@@ -94,34 +94,34 @@ export default function DemandForecast() {
             fontWeight: 600,
           }}>
             <TrendingUp size={12} />
-            High confidence · 82%
+            Planning confidence · 82%
           </div>
         </div>
         <div style={{ borderLeft: '1px solid #E5E5E5', paddingLeft: '24px' }}>
           <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#9B9B9B', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
-            Key factor today
+            Planning note
           </div>
           <p style={{ fontSize: '0.9375rem', color: '#0A0A0A', lineHeight: 1.6 }}>
             Thursday + Overcast weather increases footfall at distribution points by ~23%
           </p>
           <div style={{ marginTop: '12px', fontSize: '0.8125rem', color: '#9B9B9B' }}>
-            Next update in 2 hours · Model v3.1
+            Review again when the next route report arrives
           </div>
         </div>
       </div>
 
       {/* Zone breakdown table */}
-      <div style={{
+      <div className="forecast-table-panel" style={{
         background: '#FFFFFF',
         borderRadius: '10px',
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
         marginBottom: '24px',
         overflow: 'hidden',
       }}>
-        <div style={{ padding: '18px 24px', borderBottom: '1px solid #E5E5E5' }}>
+        <div className="forecast-panel-heading" style={{ padding: '18px 24px', borderBottom: '1px solid #E5E5E5' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0A0A0A' }}>Zone Breakdown</h2>
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table className="forecast-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#F7F7F8' }}>
               {['Zone', 'Area', 'Avg Daily', "Today's Est.", 'Trend', 'Priority'].map(h => (
@@ -178,7 +178,7 @@ export default function DemandForecast() {
       </div>
 
       {/* Bar chart */}
-      <div style={{
+      <div className="forecast-chart-panel" style={{
         background: '#FFFFFF',
         borderRadius: '10px',
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
