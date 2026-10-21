@@ -10,6 +10,7 @@ const foodTypes = ['Cooked Rice', 'Dal/Curry', 'Biryani', 'Bread/Roti', 'Snacks'
 export default function LogSurplus() {
   const { currentUser, listings, suppliers, addListing } = useApp();
   const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Determine current active supplier or fallback to first supplier
   const currentSupplier =
@@ -32,7 +33,7 @@ export default function LogSurplus() {
 
   // Active listings for this supplier from shared AppContext
   const activeListings = listings.filter(
-    l => l.supplierId === activeSupplier.id && ['Available', 'Assigned', 'Picked Up'].includes(l.status)
+    l => String(l.supplierId) === String(activeSupplier.id) && ['Available', 'Assigned', 'Picked Up'].includes(l.status)
   );
 
   function handleChange(e) {
@@ -47,8 +48,11 @@ export default function LogSurplus() {
     }
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setFormError('');
+    setSubmitted(false);
+    setIsSubmitting(true);
 
     // Construct deadline ISO
     let deadlineIso;
@@ -77,12 +81,24 @@ export default function LogSurplus() {
       notes: form.notes || 'Freshly prepared surplus batch.',
     };
 
-    setFormError('');
-    addListing(newListing).then(() => {
+    try {
+      await addListing(newListing);
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 4000);
-      setForm(f => ({ ...f, foodType: '', quantity: '', deadline: '', notes: '' }));
-    }).catch(error => setFormError(error.message));
+      setForm({
+        foodType: '',
+        quantity: '',
+        availableFrom: '',
+        deadline: '',
+        address: activeSupplier.address,
+        notes: '',
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      setFormError(error.message || 'Listing could not be added. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -151,9 +167,9 @@ export default function LogSurplus() {
         }}>
           <span style={{ fontSize: '1.2rem' }}>✓</span>
           <div>
-            <div>Surplus batch listed successfully!</div>
+          <div>Listing added</div>
             <div style={{ fontSize: '0.8rem', fontWeight: 400, color: '#065F46' }}>
-              Broadcast to volunteer queue & Ops command center immediately. Check Available Surplus to claim.
+            The listing is now available to volunteers and the Ops dashboard.
             </div>
           </div>
         </div>
@@ -263,6 +279,7 @@ export default function LogSurplus() {
 
           <button
             type="submit"
+            disabled={isSubmitting}
             style={{
               background: '#FF5C28',
               color: '#FFFFFF',
@@ -271,7 +288,8 @@ export default function LogSurplus() {
               padding: '11px 24px',
               fontSize: '0.875rem',
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: isSubmitting ? 'wait' : 'pointer',
+              opacity: isSubmitting ? 0.7 : 1,
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
@@ -282,7 +300,7 @@ export default function LogSurplus() {
             onMouseLeave={e => e.currentTarget.style.background = '#FF5C28'}
           >
             <PlusCircle size={16} />
-            Post Surplus Listing
+            {isSubmitting ? 'Adding listing…' : 'Post Surplus Listing'}
           </button>
         </form>
 
