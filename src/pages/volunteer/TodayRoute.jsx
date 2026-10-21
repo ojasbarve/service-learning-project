@@ -67,8 +67,23 @@ export default function TodayRoute() {
   const dropCount = stops.filter(s => s.type === 'drop').length;
   const routePositions = stops.map(s => [s.lat, s.lng]);
 
+  // Google Maps needs the route split into origin, waypoints, and destination.
+  // Encoding the whole stop list as one path makes Maps treat it as one place.
   const googleMapsUrl = stops.length > 0
-    ? `https://www.google.com/maps/dir/${encodeURIComponent(stops.map(s => s.name).join('/'))}`
+    ? (() => {
+        const location = stop => `${Number(stop.lat)},${Number(stop.lng)}`;
+        const origin = location(stops[0]);
+        const destination = location(stops[stops.length - 1]);
+        const waypoints = stops.slice(1, -1).map(location).join('|');
+        const params = new URLSearchParams({
+          api: '1',
+          origin,
+          destination,
+          travelmode: 'driving',
+        });
+        if (waypoints) params.set('waypoints', waypoints);
+        return `https://www.google.com/maps/dir/?${params.toString()}`;
+      })()
     : 'https://www.google.com/maps';
 
   return (
