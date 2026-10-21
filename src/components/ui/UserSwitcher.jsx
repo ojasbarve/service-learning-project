@@ -1,4 +1,5 @@
-import { useApp, USERS } from '../../context/AppContext';
+import { useApp } from '../../context/AppContext';
+import { USERS } from '../../context/users';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 

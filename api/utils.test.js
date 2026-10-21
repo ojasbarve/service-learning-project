@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { matchingSpot, normalizeListing } from './utils.js';
+import { matchingSpot, normalizeListing, optimizeRouteStops } from './utils.js';
 
 const spots = [
   { id: 'd1', area: 'Station Road', type: 'Public Hospital' },
@@ -25,4 +25,20 @@ test('normalizes database listing rows for the frontend contract', () => {
     quantity: 12.5, listedAt: '2026-10-20T10:00:00.000Z', deadline: '2026-10-20T12:00:00.000Z', address: 'Pune', lat: 18.5, lng: 73.8,
     status: 'Available', volunteerId: null, volunteerAssigned: null, notes: 'Veg',
   });
+});
+
+test('keeps completed stops first and keeps each pickup beside its drop', () => {
+  const rows = [
+    { id: 'drop-b', listing_id: 'b', type: 'drop', lat: 18.52, lng: 73.86, status: 'Pending' },
+    { id: 'pickup-a', listing_id: 'a', type: 'pickup', lat: 18.50, lng: 73.84, status: 'Pending' },
+    { id: 'completed', listing_id: 'old', type: 'pickup', lat: 18.51, lng: 73.85, status: 'Completed' },
+    { id: 'drop-a', listing_id: 'a', type: 'drop', lat: 18.51, lng: 73.85, status: 'Pending' },
+    { id: 'pickup-b', listing_id: 'b', type: 'pickup', lat: 18.70, lng: 73.90, status: 'Pending' },
+  ];
+  assert.deepEqual(optimizeRouteStops(rows).map(stop => stop.id), ['completed', 'pickup-a', 'drop-a', 'pickup-b', 'drop-b']);
+});
+
+test('does not lose unpaired route stops', () => {
+  const stop = { id: 'manual', listing_id: null, type: 'pickup', status: 'Pending', lat: 18.5, lng: 73.8 };
+  assert.deepEqual(optimizeRouteStops([stop]), [stop]);
 });

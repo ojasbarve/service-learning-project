@@ -108,11 +108,37 @@ mysql -u root -p nourish_net_db < database/performance.sql
 
 ### Deploy to Vercel
 
+This demo intentionally has no login yet. Use the role switcher to test the three shared views from one public URL:
+
+- `/supplier/history` shows a supplier whether a volunteer has claimed its listing.
+- `/volunteer/available` shows available listings and lets the volunteer claim one.
+- `/ops/overview` and the Ops pages show the shared listings, volunteers, and routes.
+
+All three portals read and write the same database. Do not use the laptop's local MariaDB for production: Vercel needs a hosted MySQL-compatible database.
+
 ```bash
 npx vercel --prod
 ```
 
-Add `DATABASE_URL`, `DATABASE_SSL=true` when required by the provider, and `CORS_ORIGIN` in Vercel's Production environment. Redeploy after changing environment variables.
+Before the first production deployment, create the schema and seed data in the hosted database:
+
+```bash
+mysql --protocol=TCP -h <host> -P <port> -u <user> -p < database/schema.sql
+mysql --protocol=TCP -h <host> -P <port> -u <user> -p nourish_net_db < database/seed.sql
+mysql --protocol=TCP -h <host> -P <port> -u <user> -p nourish_net_db < database/performance.sql
+```
+
+Add these Vercel Production environment variables, then redeploy:
+
+```text
+DATABASE_URL=mysql://<user>:<password>@<host>:<port>/<database>
+DATABASE_SSL=true                  # only when required by the provider
+DATABASE_SSL_VERIFY=false         # FreeDB uses a self-signed CA; use true for trusted providers
+CORS_ORIGIN=https://<your-domain>
+OLLAMA_ENABLED=false
+```
+
+The same deployed URL works in desktop and mobile browsers; the app's responsive layout switches to a bottom navigation bar on small screens. The local role switcher is a temporary demo control and is intentionally not security.
 
 Health check:
 

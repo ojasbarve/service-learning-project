@@ -20,7 +20,7 @@ function getPool() {
       keepAliveInitialDelay: 0,
       namedPlaceholders: true,
       decimalNumbers: true,
-      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
+      ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: process.env.DATABASE_SSL_VERIFY !== 'false' } : undefined,
     });
   }
   return pool;

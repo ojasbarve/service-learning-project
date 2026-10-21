@@ -69,3 +69,42 @@ export function matchingSpot(area, spots) {
   if (norm.includes('kothrud') || norm.includes('karve') || norm.includes('katraj')) return spots.find(s => s.id === 'd3') || spots[0];
   return spots[0];
 }
+
+function squaredDistance(a, b) {
+  const lat = Number(a.lat) - Number(b.lat);
+  const lng = Number(a.lng) - Number(b.lng);
+  return (lat * lat) + (lng * lng);
+}
+
+export function optimizeRouteStops(rows) {
+  const completed = rows.filter(stop => stop.status === 'Completed');
+  const pending = rows.filter(stop => stop.status !== 'Completed');
+  const pairs = new Map();
+  for (const stop of pending) {
+    if (!stop.listing_id) continue;
+    if (!pairs.has(stop.listing_id)) pairs.set(stop.listing_id, []);
+    pairs.get(stop.listing_id).push(stop);
+  }
+
+  const ordered = [];
+  let cursor = completed.at(-1) || pending[0];
+  while (pairs.size) {
+    let nextId;
+    let nextPair;
+    for (const [listingId, pair] of pairs) {
+      const pickup = pair.find(stop => stop.type === 'pickup');
+      if (pickup && (!nextPair || squaredDistance(cursor || pickup, pickup) < squaredDistance(cursor || pickup, nextPair.find(stop => stop.type === 'pickup')))) {
+        nextId = listingId;
+        nextPair = pair;
+      }
+    }
+    if (!nextPair) break;
+    pairs.delete(nextId);
+    const pickup = nextPair.find(stop => stop.type === 'pickup');
+    const drop = nextPair.find(stop => stop.type === 'drop');
+    if (pickup) ordered.push(pickup);
+    if (drop) ordered.push(drop);
+    cursor = drop || pickup || cursor;
+  }
+  return [...completed, ...ordered, ...pending.filter(stop => !stop.listing_id)];
+}

@@ -70,6 +70,12 @@ export default function AvailableSurplus() {
         </div>
       )}
 
+      <div className="queue-metrics" aria-label="Queue summary">
+        <div><span>Available now</span><strong>{available.length}</strong><small>pickups in Pune</small></div>
+        <div><span>Needs attention</span><strong>{urgent.length}</strong><small>within two hours</small></div>
+        <div><span>Total food</span><strong>{available.reduce((sum, listing) => sum + Number(listing.quantity || 0), 0)} kg</strong><small>ready to rescue</small></div>
+      </div>
+
       <div className="queue-toolbar">
         <div className="queue-filters" role="group" aria-label="Filter surplus">
           <Filter size={15} />
