@@ -1,6 +1,7 @@
 export default function StatCard({ number, label, sub, trend, accentNumber = false }) {
   return (
     <div
+      className="ops-stat-card"
       style={{
         background: '#FFFFFF',
         borderRadius: '10px',

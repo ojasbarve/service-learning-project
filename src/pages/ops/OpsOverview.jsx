@@ -120,13 +120,13 @@ export default function OpsOverview() {
   return (
     <div className="operations-page ops-overview-page" style={{ maxWidth: 1100, margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
-          Ops Overview
-        </h1>
-        <p style={{ fontSize: '0.875rem', color: '#9B9B9B', marginTop: '4px' }}>
-          Live coordination dashboard for Sevadeep coordinators
-        </p>
+      <div className="ops-page-header">
+        <div>
+          <p className="ops-page-kicker">Live operations</p>
+          <h1>Today's coordination desk</h1>
+          <p className="ops-page-subtitle">Track surplus, dispatch volunteers, and protect every pickup window.</p>
+        </div>
+        <div className="ops-live-state"><span /> Live sync · updates every 30 sec</div>
       </div>
 
       {/* Stat cards */}
@@ -151,16 +151,16 @@ export default function OpsOverview() {
       </section>
 
       {/* Live Surplus Map */}
-      <div style={{
+      <section className="ops-panel ops-map-panel" style={{
         background: '#FFFFFF',
         borderRadius: '10px',
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
         padding: '20px',
         marginBottom: '24px',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0A0A0A' }}>Live Surplus Map</h2>
-          <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#9B9B9B' }}>
+        <div className="ops-panel-heading">
+          <div><p className="ops-section-kicker">Dispatch view</p><h2>Live surplus map</h2></div>
+          <div className="ops-map-legend">
             {[
               { color: '#00A67E', label: 'Available' },
               { color: '#0070F3', label: 'Assigned' },
@@ -174,7 +174,7 @@ export default function OpsOverview() {
           </div>
         </div>
 
-        <div style={{ borderRadius: '10px', overflow: 'hidden', height: 380, position: 'relative' }}>
+        <div className="ops-map-canvas" style={{ borderRadius: '10px', overflow: 'hidden', height: 380, position: 'relative' }}>
           <MapContainer center={puneCenter} zoom={12} style={{ height: '100%', width: '100%' }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -288,20 +288,18 @@ export default function OpsOverview() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Two-column section */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+      <div className="ops-overview-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
         {/* Left — area bar chart */}
-        <div style={{
+        <section className="ops-panel" style={{
           background: '#FFFFFF',
           borderRadius: '10px',
           boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
           padding: '20px',
         }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0A0A0A', marginBottom: '16px' }}>
-            Surplus by Area
-          </h2>
+          <div className="ops-panel-heading"><div><p className="ops-section-kicker">Coverage</p><h2>Surplus by area</h2></div><span className="ops-panel-note">kg available</span></div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={areaBarData} layout="vertical" barSize={18}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" horizontal={false} />
@@ -324,17 +322,18 @@ export default function OpsOverview() {
               <Bar dataKey="kg" radius={[0, 4, 4, 0]} fill="#FF5C28" opacity={0.85} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </section>
 
         {/* Right — volunteer status table */}
-        <div style={{
+        <section className="ops-panel ops-status-panel" style={{
           background: '#FFFFFF',
           borderRadius: '10px',
           boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
           overflow: 'hidden',
         }}>
-          <div style={{ padding: '18px 20px', borderBottom: '1px solid #E5E5E5' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0A0A0A' }}>Volunteer Status</h2>
+          <div className="ops-panel-heading" style={{ padding: '18px 20px', borderBottom: '1px solid #E5E5E5' }}>
+            <div><p className="ops-section-kicker">Field team</p><h2>Volunteer status</h2></div>
+            <span className="ops-panel-note">{activeVols} active</span>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -367,20 +366,18 @@ export default function OpsOverview() {
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
       </div>
 
       {/* Surge alerts */}
-      <div style={{
+      <section className="ops-panel ops-alert-panel" style={{
         background: '#FFFFFF',
         borderRadius: '10px',
         boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
         padding: '20px',
       }}>
-        <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0A0A0A', marginBottom: '16px' }}>
-          Upcoming Surge Alerts
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+        <div className="ops-panel-heading"><div><p className="ops-section-kicker">Plan ahead</p><h2>Upcoming surge alerts</h2></div><span className="ops-panel-note">{upcomingEvents.length} on calendar</span></div>
+        <div className="ops-alert-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
           {upcomingEvents.map(ev => (
             <div key={ev.id} style={{
               background: '#F7F7F8',
@@ -427,7 +424,7 @@ export default function OpsOverview() {
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
