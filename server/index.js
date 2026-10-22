@@ -166,7 +166,8 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(204).end();
-    const rawRoute = req.query.route;
+    const routeFromUrl = String(req.url || '').split('?')[0].replace(/^\/?api\/?/, '');
+    const rawRoute = req.query.route ?? routeFromUrl;
     const parts = (Array.isArray(rawRoute) ? rawRoute : String(rawRoute || '').split('/')).filter(Boolean);
     const [resource, id, action] = parts;
     if (resource === 'health' && req.method === 'GET') {
