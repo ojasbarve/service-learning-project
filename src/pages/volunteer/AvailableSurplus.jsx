@@ -13,6 +13,7 @@ export default function AvailableSurplus() {
   const [sort, setSort] = useState('Expiring soonest');
   const [claimingId, setClaimingId] = useState(null);
   const [actionError, setActionError] = useState('');
+  const [claimedListing, setClaimedListing] = useState('');
 
   const now = new Date();
   const available = listings.filter(l => l.status === 'Available');
@@ -41,7 +42,8 @@ export default function AvailableSurplus() {
     const volunteerId = currentUser?.role === 'volunteer' ? currentUser.volunteerId : 'v1';
     setClaimingId(listing.id);
     setActionError('');
-    try { await claimListing(listing.id, volunteerId); }
+    setClaimedListing('');
+    try { await claimListing(listing.id, volunteerId); setClaimedListing(listing.supplierName); }
     catch (error) { setActionError(error.message); }
     finally { setClaimingId(null); }
   }
@@ -61,6 +63,7 @@ export default function AvailableSurplus() {
       </header>
 
       {actionError && <div role="alert" className="queue-error">{actionError}</div>}
+      {claimedListing && <div role="status" className="queue-success"><strong>Pickup accepted.</strong> {claimedListing} is now assigned to you and visible to the supplier and Ops.</div>}
       {loading && <div className="queue-loading">Refreshing the pickup queue…</div>}
 
       {urgent.length > 0 && (

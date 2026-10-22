@@ -13,6 +13,7 @@ export function AppProvider({ children }) {
   const [deliverySpots, setDeliverySpots] = useState(fallbackDeliverySpots);
   const [routes, setRoutes] = useState(fallbackRoutes);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [lastSyncedAt, setLastSyncedAt] = useState(null);
   const refreshInFlight = useRef(false);
@@ -20,6 +21,7 @@ export function AppProvider({ children }) {
   const refresh = useCallback(async () => {
     if (refreshInFlight.current) return;
     refreshInFlight.current = true;
+    setRefreshing(true);
     try {
       const [nextListings, nextVolunteers, nextSuppliers, nextSpots] = await Promise.all([
         api.listings(), api.volunteers(), api.suppliers(), api.deliverySpots(),
@@ -28,10 +30,10 @@ export function AppProvider({ children }) {
       const nextRoutes = await api.volunteerRoutes();
       setRoutes(nextRoutes); setError(''); setLastSyncedAt(new Date());
     } catch (err) { setError(err.message); }
-    finally { setLoading(false); refreshInFlight.current = false; }
+    finally { setLoading(false); setRefreshing(false); refreshInFlight.current = false; }
   }, []);
 
-  useEffect(() => { refresh(); const timer = setInterval(refresh, 30000); return () => clearInterval(timer); }, [refresh]);
+  useEffect(() => { refresh(); const timer = setInterval(refresh, 10000); return () => clearInterval(timer); }, [refresh]);
 
   async function claimListing(listingId, volunteerId) { await api.claimListing(listingId, volunteerId); await refresh(); }
   async function removeRouteStop(stopId) { const result = await api.removeRouteStop(stopId); await refresh(); return result; }
@@ -41,7 +43,7 @@ export function AppProvider({ children }) {
   }
   function getVolunteerRoute(volunteerId) { return routes[volunteerId] || []; }
 
-  return <AppCtx.Provider value={{ currentUser, setCurrentUser, listings, volunteers, suppliers, deliverySpots, routes, loading, error, lastSyncedAt, refresh, claimListing, addListing, removeRouteStop, getVolunteerRoute }}>{children}</AppCtx.Provider>;
+  return <AppCtx.Provider value={{ currentUser, setCurrentUser, listings, volunteers, suppliers, deliverySpots, routes, loading, refreshing, error, lastSyncedAt, refresh, claimListing, addListing, removeRouteStop, getVolunteerRoute }}>{children}</AppCtx.Provider>;
 }
 
 export function useApp() { return useContext(AppCtx); }

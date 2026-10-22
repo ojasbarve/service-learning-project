@@ -1,10 +1,21 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      cache: 'no-store',
+      signal: options.signal || controller.signal,
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    });
+  } catch (error) {
+    throw new Error(error.name === 'AbortError'
+      ? 'The live API took too long to respond. Check the server and try again.'
+      : 'The live API is unavailable. Check the connection and try again.');
+  } finally { clearTimeout(timeout); }
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.includes('application/json')) {
     throw new Error('Live API is unavailable. Start the Vercel development server to load database data.');
