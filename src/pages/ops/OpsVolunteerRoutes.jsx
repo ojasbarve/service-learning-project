@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
+import { Navigation } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import RouteTimeline from '../../components/ui/RouteTimeline';
 import { useApp } from '../../context/AppContext';
@@ -57,6 +58,20 @@ export default function OpsVolunteerRoutes() {
   const pickupCount = stops.filter(s => s.type === 'pickup').length;
   const dropCount = stops.filter(s => s.type === 'drop').length;
   const routePositions = stops.map(s => [s.lat, s.lng]);
+  const googleMapsUrl = stops.length > 0
+    ? (() => {
+        const location = stop => `${Number(stop.lat)},${Number(stop.lng)}`;
+        const params = new URLSearchParams({
+          api: '1',
+          origin: location(stops[0]),
+          destination: location(stops[stops.length - 1]),
+          travelmode: 'driving',
+        });
+        const waypoints = stops.slice(1, -1).map(location).join('|');
+        if (waypoints) params.set('waypoints', waypoints);
+        return `https://www.google.com/maps/dir/?${params.toString()}`;
+      })()
+    : 'https://www.google.com/maps';
 
   return (
     <div className="operations-page ops-routes-page" style={{ maxWidth: 1180, margin: '0 auto' }}>
@@ -214,6 +229,23 @@ export default function OpsVolunteerRoutes() {
                   {pickupCount} Pickups · {dropCount} Drops
                 </div>
               </div>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={stops.length === 0}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '7px',
+                  padding: '10px 13px', borderRadius: '8px',
+                  background: stops.length > 0 ? '#FF5C28' : '#E5E7EB',
+                  color: stops.length > 0 ? '#FFFFFF' : '#9CA3AF',
+                  textDecoration: 'none', fontSize: '0.78rem', fontWeight: 700,
+                  pointerEvents: stops.length > 0 ? 'auto' : 'none',
+                }}
+              >
+                <Navigation size={15} />
+                Open A → B → C → D in Google Maps
+              </a>
             </div>
           </div>
 
