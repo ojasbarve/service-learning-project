@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { CalendarDays, TriangleAlert } from 'lucide-react';
+import { CalendarDays, TriangleAlert, Megaphone } from 'lucide-react';
 import { upcomingEvents } from '../../data/mockData';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
@@ -103,9 +103,21 @@ export default function OpsOverview() {
   const [briefing, setBriefing] = useState(null);
   const [briefingLoading, setBriefingLoading] = useState(false);
   const [briefingError, setBriefingError] = useState('');
+  const [pingStatus, setPingStatus] = useState('');
   const liveListings = listings.filter(l => ['Available', 'Assigned'].includes(l.status));
   const totalKg = liveListings.reduce((s, l) => s + l.quantity, 0);
   const activeVols = volunteers.filter(v => v.status !== 'Offline').length;
+  const availableVolunteers = volunteers.filter(v => v.status === 'Available');
+
+  function pingAvailableVolunteers() {
+    if (!availableVolunteers.length) {
+      setPingStatus('No available volunteers to ping right now.');
+      return;
+    }
+    const timestamp = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    localStorage.setItem('nourish:lastVolunteerPing', JSON.stringify({ timestamp, count: availableVolunteers.length }));
+    setPingStatus(`Demo broadcast sent to ${availableVolunteers.length} available volunteer${availableVolunteers.length === 1 ? '' : 's'} at ${timestamp}.`);
+  }
 
   async function generateBriefing() {
     setBriefingLoading(true); setBriefingError('');
@@ -126,8 +138,19 @@ export default function OpsOverview() {
           <h1>Today's coordination desk</h1>
           <p className="ops-page-subtitle">Track surplus, dispatch volunteers, and protect every pickup window.</p>
         </div>
-        <div className="ops-live-state"><span /> Live sync · updates every 30 sec</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            onClick={pingAvailableVolunteers}
+            title="Demo-only in-app broadcast; no SMS or push notification is sent"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', border: '1px solid #F6B59F', borderRadius: '8px', padding: '9px 12px', background: '#FFF7F3', color: '#B74629', font: 'inherit', fontSize: '.78rem', fontWeight: 700, cursor: 'pointer' }}
+          >
+            <Megaphone size={15} /> Ping available volunteers
+          </button>
+          <div className="ops-live-state"><span /> Live sync · updates every 30 sec</div>
+        </div>
       </div>
+      {pingStatus && <div role="status" style={{ marginBottom: '18px', padding: '11px 14px', border: '1px solid #A7F3D0', borderRadius: '8px', background: '#ECFDF5', color: '#047857', fontSize: '.82rem', fontWeight: 600 }}>{pingStatus} <span style={{ fontWeight: 400 }}>Demo broadcast only.</span></div>}
 
       {/* Stat cards */}
       <div className="ops-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
