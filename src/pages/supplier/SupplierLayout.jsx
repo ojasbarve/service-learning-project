@@ -1,9 +1,10 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import { ClipboardList, History, User } from 'lucide-react';
 import Layout from '../../components/layout/Layout';
 import LogSurplus from './LogSurplus';
 import SurplusHistory from './SurplusHistory';
 import SupplierProfile from './SupplierProfile';
+import { useApp } from '../../context/AppContext';
 
 const navItems = [
   { path: 'log',     label: 'Log Surplus',  icon: ClipboardList },
@@ -13,6 +14,9 @@ const navItems = [
 
 export default function SupplierLayout() {
   const { pathname } = useLocation();
+  const { currentUser } = useApp();
+  if (currentUser?.role === 'volunteer') return <Navigate to="/volunteer/available" replace />;
+  if (currentUser?.role === 'ops') return <Navigate to="/ops/overview" replace />;
   const sub = pathname.split('/').pop();
 
   let content;

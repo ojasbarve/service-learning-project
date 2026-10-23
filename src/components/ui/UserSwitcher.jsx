@@ -2,6 +2,7 @@ import { useApp } from '../../context/AppContext';
 import { USERS } from '../../context/users';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const allUsers = [...USERS.suppliers, ...USERS.volunteers, ...USERS.ops];
 
@@ -13,6 +14,7 @@ const roleColors = {
 
 export default function UserSwitcher() {
   const { currentUser, setCurrentUser } = useApp();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const rc = roleColors[currentUser.role];
 
@@ -54,7 +56,11 @@ export default function UserSwitcher() {
               {allUsers.filter(u => u.role === role).map(u => (
                 <button
                   key={u.id}
-                  onClick={() => { setCurrentUser(u); setOpen(false); }}
+                  onClick={() => {
+                    setCurrentUser(u);
+                    setOpen(false);
+                    navigate(u.role === 'supplier' ? '/supplier/log' : u.role === 'volunteer' ? '/volunteer/available' : '/ops/overview');
+                  }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '8px',
                     width: '100%', padding: '8px 12px',

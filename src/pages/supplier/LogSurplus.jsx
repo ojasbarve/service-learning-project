@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bike, Info, PlusCircle } from 'lucide-react';
 import Badge from '../../components/ui/Badge';
 import StatCard from '../../components/ui/StatCard';
@@ -30,6 +30,10 @@ export default function LogSurplus() {
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (activeSupplier?.address) setForm(f => ({ ...f, address: activeSupplier.address }));
+  }, [activeSupplier?.id, activeSupplier?.address]);
 
   // Active listings for this supplier from shared AppContext
   const activeListings = listings.filter(

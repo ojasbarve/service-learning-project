@@ -1,4 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useApp } from '../../context/AppContext';
+import { USERS } from '../../context/users';
 
 const roles = [
   { label: 'Supplier', path: '/supplier' },
@@ -9,6 +11,7 @@ const roles = [
 export default function TopBar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { setCurrentUser } = useApp();
 
   const activeRole = roles.find(r => pathname.startsWith(r.path)) ?? null;
 
@@ -29,7 +32,11 @@ export default function TopBar() {
             return (
               <button className={`app-role-button${isActive ? ' active' : ''}`}
                 key={role.path}
-                onClick={() => navigate(role.path)}
+                onClick={() => {
+                  const roleKey = role.path.slice(1) === 'ops' ? 'ops' : role.path.slice(1);
+                  setCurrentUser(USERS[roleKey][0]);
+                  navigate(role.path);
+                }}
               >
                 {role.label}
               </button>
