@@ -24,8 +24,8 @@ export default function LogSurplus() {
   const [form, setForm] = useState({
     foodType: '',
     quantity: '',
-    availableFrom: '',
-    deadline: '',
+    availableFrom: '09:00',
+    deadline: '14:00',
     address: activeSupplier.address,
     notes: '',
   });
@@ -88,8 +88,8 @@ export default function LogSurplus() {
       setForm({
         foodType: '',
         quantity: '',
-        availableFrom: '',
-        deadline: '',
+        availableFrom: '09:00',
+        deadline: '14:00',
         address: activeSupplier.address,
         notes: '',
       });

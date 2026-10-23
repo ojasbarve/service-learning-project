@@ -25,7 +25,8 @@ async function listListings(req, res) {
   if (req.query.supplierId) { where.push('l.supplier_id=:supplierId'); params.supplierId = req.query.supplierId; }
   const requestedLimit = Number(req.query.limit || 100);
   const limit = Number.isInteger(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 250) : 100;
-  const [rows] = await db().query(`${listingSelect} ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY l.created_at DESC LIMIT ${limit}`, params);
+  where.push('l.deadline > NOW()');
+  const [rows] = await db().query(`${listingSelect} WHERE ${where.join(' AND ')} ORDER BY l.created_at DESC LIMIT ${limit}`, params);
   return sendJson(res, 200, rows.map(normalizeListing));
 }
 
@@ -84,12 +85,12 @@ async function claimListing(req, res, listingId) {
 }
 
 async function route(req, res, volunteerId) {
-  const [rows] = await db().query('SELECT * FROM route_stops WHERE volunteer_id=:volunteerId ORDER BY sequence_order', { volunteerId });
+  const [rows] = await db().query('SELECT * FROM route_stops WHERE volunteer_id=:volunteerId AND (listing_id IS NULL OR listing_id IN (SELECT id FROM surplus_listings WHERE deadline > NOW())) ORDER BY sequence_order', { volunteerId });
   return sendJson(res, 200, rows.map(normalizeStop));
 }
 
 async function allRoutes(req, res) {
-  const [rows] = await db().query('SELECT * FROM route_stops ORDER BY volunteer_id, sequence_order');
+  const [rows] = await db().query('SELECT * FROM route_stops WHERE listing_id IS NULL OR listing_id IN (SELECT id FROM surplus_listings WHERE deadline > NOW()) ORDER BY volunteer_id, sequence_order');
   const routes = {};
   for (const row of rows) {
     if (!routes[row.volunteer_id]) routes[row.volunteer_id] = [];
@@ -185,8 +186,8 @@ export default async function handler(req, res) {
     if (resource === 'suppliers' && req.method === 'GET') { const [rows] = await db().query('SELECT * FROM suppliers ORDER BY id'); return sendJson(res, 200, rows.map(row => ({ ...row, totalDonated: Number(row.total_donated_kg), mealsEnabled: row.meals_enabled, contact: row.contact_person, partnerSince: row.partner_since }))); }
     if (resource === 'delivery-spots' && req.method === 'GET') { const [rows] = await db().query('SELECT * FROM delivery_spots ORDER BY id'); return sendJson(res, 200, rows.map(row => ({ ...row, lat: Number(row.lat), lng: Number(row.lng), contact: row.contact_person }))); }
     if (resource === 'ops' && id === 'overview' && req.method === 'GET') {
-      const [stats] = await db().query(`SELECT (SELECT COALESCE(SUM(quantity_kg),0) FROM surplus_listings WHERE status='Distributed') total_kg, (SELECT COUNT(*) FROM surplus_listings WHERE status IN ('Available','Assigned')) active_listings, (SELECT COUNT(*) FROM volunteers WHERE status <> 'Offline') active_volunteers, (SELECT COUNT(*) FROM volunteers) total_volunteers`);
-      const [listings] = await db().query(`${listingSelect} WHERE l.status IN ('Available','Assigned')`);
+      const [stats] = await db().query(`SELECT (SELECT COALESCE(SUM(quantity_kg),0) FROM surplus_listings WHERE status='Distributed') total_kg, (SELECT COUNT(*) FROM surplus_listings WHERE status IN ('Available','Assigned') AND deadline > NOW()) active_listings, (SELECT COUNT(*) FROM volunteers WHERE status <> 'Offline') active_volunteers, (SELECT COUNT(*) FROM volunteers) total_volunteers`);
+      const [listings] = await db().query(`${listingSelect} WHERE l.status IN ('Available','Assigned') AND l.deadline > NOW()`);
       const [spots] = await db().query('SELECT * FROM delivery_spots ORDER BY id');
       const [volunteers] = await db().query('SELECT * FROM volunteers ORDER BY id');
       return sendJson(res, 200, { ...stats[0], totalKg: Number(stats[0].total_kg), activeListings: Number(stats[0].active_listings), activeVolunteers: Number(stats[0].active_volunteers), mapMarkers: [...listings.map(normalizeListing), ...spots.map(s => ({ ...s, lat: Number(s.lat), lng: Number(s.lng), markerType: 'delivery' }))], volunteers: volunteers.map(normalizeVolunteer) });
