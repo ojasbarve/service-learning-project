@@ -244,7 +244,7 @@ export default function OpsVolunteerRoutes() {
                 }}
               >
                 <Navigation size={15} />
-                Open A → B → C → D in Google Maps
+                Start route
               </a>
             </div>
           </div>
