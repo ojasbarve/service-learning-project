@@ -33,9 +33,12 @@ export function AppProvider({ children }) {
     refreshInFlight.current = true;
     setRefreshing(true);
     try {
-      const [nextListings, nextVolunteers, nextSuppliers, nextSpots] = await Promise.all([
-        api.listings(), api.volunteers(), api.suppliers(), api.deliverySpots(),
-      ]);
+      // FreeDB permits only a few simultaneous sessions. Keep the demo's
+      // refresh burst serial so two browsers do not exhaust the shared cap.
+      const nextListings = await api.listings();
+      const nextVolunteers = await api.volunteers();
+      const nextSuppliers = await api.suppliers();
+      const nextSpots = await api.deliverySpots();
       setListings(nextListings); setVolunteers(nextVolunteers); setSuppliers(nextSuppliers); setDeliverySpots(nextSpots);
       const nextRoutes = await api.volunteerRoutes();
       setRoutes(keepRouteDemoCoherent(nextRoutes)); setError(''); setLastSyncedAt(new Date());
@@ -43,7 +46,7 @@ export function AppProvider({ children }) {
     finally { setLoading(false); setRefreshing(false); refreshInFlight.current = false; }
   }, []);
 
-  useEffect(() => { refresh(); const timer = setInterval(refresh, 10000); return () => clearInterval(timer); }, [refresh]);
+  useEffect(() => { refresh(); const timer = setInterval(refresh, 30000); return () => clearInterval(timer); }, [refresh]);
 
   async function claimListing(listingId, volunteerId) { await api.claimListing(listingId, volunteerId); await refresh(); }
   async function removeRouteStop(stopId) { const result = await api.removeRouteStop(stopId); await refresh(); return result; }
