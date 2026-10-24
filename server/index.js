@@ -132,6 +132,43 @@ function repairRoutePairs(rows) {
       sequence_order: Number(drop.sequence_order) - 0.1,
     });
   }
+
+  // Legacy demo rows were imported without listing_id. Give each drop-only
+  // route a stable pickup anchor so the public demo never shows an impossible
+  // "0 pickups / N drops" route.
+  const demoPickups = {
+    v1: ['Infosys BPO Canteen', 'IT Park Canteen', 'Hinjewadi', '60 kg (Mixed Meal)', 18.5912, 73.7389, 'Phase 1, Hinjewadi'],
+    v2: ['The Westin Pune', 'Hotel Banquet', 'Koregaon Park', '45 kg (Bread/Roti)', 18.5362, 73.893, 'Koregaon Park Annex'],
+    v3: ['COEP Technological University', 'College Canteen', 'Shivajinagar', '18 kg (Mixed Meal)', 18.5308, 73.8474, 'Wellesley Road, Shivajinagar'],
+    v4: ['German Bakery', 'Bakery', 'Koregaon Park', '25 kg (Breads & Rolls)', 18.5345, 73.8952, 'North Main Road, Koregaon Park'],
+    v5: ['MIT WPU Central Canteen', 'College Canteen', 'Kothrud', '15 kg (Mixed Meal)', 18.5074, 73.8077, 'Paud Road, Kothrud'],
+    v6: ['Hotel Durvankur', 'Restaurant', 'Sadashiv Peth', '28 kg (Dal/Curry)', 18.5128, 73.8567, '2570, Sadashiv Peth'],
+  };
+  const byVolunteer = new Map();
+  for (const row of repaired) {
+    if (!byVolunteer.has(row.volunteer_id)) byVolunteer.set(row.volunteer_id, []);
+    byVolunteer.get(row.volunteer_id).push(row);
+  }
+  for (const [volunteerId, volunteerRows] of byVolunteer) {
+    if (volunteerRows.some(row => row.type === 'pickup')) continue;
+    const drop = volunteerRows.find(row => row.type === 'drop');
+    const pickup = demoPickups[volunteerId];
+    if (!drop || !pickup) continue;
+    repaired.push({
+      ...drop,
+      id: `demo-pickup-${volunteerId}-${drop.id}`,
+      listing_id: null,
+      type: 'pickup',
+      category: pickup[1],
+      name: pickup[0],
+      area: pickup[2],
+      detail: pickup[3],
+      address: pickup[6],
+      lat: pickup[4],
+      lng: pickup[5],
+      sequence_order: Number(drop.sequence_order) - 0.1,
+    });
+  }
   return repaired.sort((a, b) => Number(a.sequence_order) - Number(b.sequence_order));
 }
 
@@ -140,8 +177,10 @@ async function removeRouteStop(req, res, stopId) {
     const [rows] = await connection.query('SELECT * FROM route_stops WHERE id=:stopId FOR UPDATE', { stopId });
     let stop = rows[0];
     if (!stop && String(stopId).startsWith('demo-pickup-')) {
-      const listingId = String(stopId).replace(/^demo-pickup-/, '');
-      const [linked] = await connection.query('SELECT * FROM route_stops WHERE listing_id=:listingId ORDER BY sequence_order FOR UPDATE', { listingId });
+      const parts = String(stopId).split('-');
+      const [linked] = parts.length === 3
+        ? await connection.query('SELECT * FROM route_stops WHERE listing_id=:listingId ORDER BY sequence_order FOR UPDATE', { listingId: parts[2] })
+        : await connection.query('SELECT * FROM route_stops WHERE id=:linkedStopId FOR UPDATE', { linkedStopId: parts.slice(3).join('-') });
       stop = linked[0];
     }
     if (!stop) return { status: 404, body: { error: 'Route stop not found' } };
