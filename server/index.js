@@ -103,6 +103,33 @@ async function allRoutes(req, res) {
   return sendJson(res, 200, { routes });
 }
 
+async function bootstrap(req, res) {
+  const connection = await db().getConnection();
+  try {
+    const [listingRows] = await connection.query(`${listingSelect} WHERE l.deadline > NOW() ORDER BY l.created_at DESC LIMIT 250`);
+    const [volunteerRows] = await connection.query('SELECT v.*, (SELECT GROUP_CONCAT(l.id) FROM surplus_listings l WHERE l.volunteer_id=v.id AND l.status IN ("Assigned","Picked Up")) assigned_listings FROM volunteers v ORDER BY v.id');
+    const [supplierRows] = await connection.query('SELECT * FROM suppliers ORDER BY id');
+    const [spotRows] = await connection.query('SELECT * FROM delivery_spots ORDER BY id');
+    const [routeRows] = await connection.query(`SELECT rs.*, s.name supplier_name, s.area supplier_area, s.type supplier_type, l.food_type, l.quantity_kg, l.address listing_address, l.lat listing_lat, l.lng listing_lng
+      FROM route_stops rs LEFT JOIN surplus_listings l ON l.id=rs.listing_id LEFT JOIN suppliers s ON s.id=l.supplier_id
+      WHERE rs.listing_id IS NULL OR l.deadline > NOW() ORDER BY rs.volunteer_id, rs.sequence_order`);
+    const routes = {};
+    for (const row of repairRoutePairs(routeRows)) {
+      if (!routes[row.volunteer_id]) routes[row.volunteer_id] = [];
+      routes[row.volunteer_id].push(normalizeStop(row));
+    }
+    return sendJson(res, 200, {
+      listings: listingRows.map(normalizeListing),
+      volunteers: volunteerRows.map(row => normalizeVolunteer({ ...row, assigned_listings: row.assigned_listings ? String(row.assigned_listings).split(',') : [] })),
+      suppliers: supplierRows.map(row => ({ ...row, totalDonated: Number(row.total_donated_kg), mealsEnabled: row.meals_enabled, contact: row.contact_person, partnerSince: row.partner_since })),
+      deliverySpots: spotRows.map(row => ({ ...row, lat: Number(row.lat), lng: Number(row.lng), contact: row.contact_person })),
+      routes,
+    });
+  } finally {
+    connection.release();
+  }
+}
+
 // Older demo imports occasionally contained a drop without its pickup row.
 // Keep the data read-only and repair the presentation from the linked listing.
 function repairRoutePairs(rows) {
@@ -255,6 +282,7 @@ export default async function handler(req, res) {
       try { await db().query('SELECT 1'); return sendJson(res, 200, { ok: true, database: 'connected' }); }
       catch { return sendJson(res, 503, { ok: false, database: 'unavailable' }); }
     }
+    if (resource === 'bootstrap' && req.method === 'GET') return bootstrap(req, res);
     if (resource === 'routes' && !id && req.method === 'GET') return allRoutes(req, res);
     if (resource === 'routes' && id && req.method === 'DELETE') return removeRouteStop(req, res, id);
     if (resource === 'llm' && id === 'ops-summary' && req.method === 'POST') return localOpsSummary(req, res);

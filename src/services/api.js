@@ -33,6 +33,7 @@ function asArray(body, key) {
 }
 
 export const api = {
+  bootstrap: () => request('/bootstrap'),
   health: () => request('/health'),
   listings: (params = {}) => request(`/listings?${new URLSearchParams(params)}`).then(body => asArray(body, 'listings')),
   createListing: data => request('/listings', { method: 'POST', body: JSON.stringify(data) }),

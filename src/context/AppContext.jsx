@@ -35,12 +35,13 @@ export function AppProvider({ children }) {
     try {
       // FreeDB permits only a few simultaneous sessions. Keep the demo's
       // refresh burst serial so two browsers do not exhaust the shared cap.
-      const nextListings = await api.listings();
-      const nextVolunteers = await api.volunteers();
-      const nextSuppliers = await api.suppliers();
-      const nextSpots = await api.deliverySpots();
+      const snapshot = await api.bootstrap();
+      const nextListings = snapshot.listings || [];
+      const nextVolunteers = snapshot.volunteers || [];
+      const nextSuppliers = snapshot.suppliers || [];
+      const nextSpots = snapshot.deliverySpots || [];
       setListings(nextListings); setVolunteers(nextVolunteers); setSuppliers(nextSuppliers); setDeliverySpots(nextSpots);
-      const nextRoutes = await api.volunteerRoutes();
+      const nextRoutes = snapshot.routes || {};
       setRoutes(keepRouteDemoCoherent(nextRoutes)); setError(''); setLastSyncedAt(new Date());
     } catch (err) { setError(err.message); }
     finally { setLoading(false); setRefreshing(false); refreshInFlight.current = false; }
