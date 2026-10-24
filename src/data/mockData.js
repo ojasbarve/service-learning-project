@@ -129,12 +129,14 @@ export const initialVolunteerRoutes = {
   v2: [
     { id: 'r-v2-1', type: 'pickup', category: 'Hotel Banquet', name: 'The Westin Pune', area: 'Koregaon Park', detail: '45 kg (Bread/Roti)', lat: 18.5362, lng: 73.893, address: 'Koregaon Park Annex' },
     { id: 'r-v2-2', type: 'drop', category: 'Community Shelter', name: 'Yerwada Resettlement Colony', area: 'Yerwada', detail: '110 meal packets', lat: 18.5494, lng: 73.9078, address: 'Yerwada Cluster' },
-    { id: 'r-v2-3', type: 'drop', category: 'Public Hospital', name: 'KEM Hospital Patient Attendant Hub', area: 'Rasta Peth', detail: '50 meal packets', lat: 18.5208, lng: 73.8682, address: 'Rasta Peth, Pune' },
+    { id: 'r-v2-3', type: 'pickup', category: 'Local Dhaba', name: 'Roopali Dhaba', area: 'FC Road', detail: '18 kg (Dal/Curry)', lat: 18.5236, lng: 73.8397, address: 'FC Road, Shivajinagar' },
+    { id: 'r-v2-4', type: 'drop', category: 'Public Hospital', name: 'KEM Hospital Patient Attendant Hub', area: 'Rasta Peth', detail: '50 meal packets', lat: 18.5208, lng: 73.8682, address: 'Rasta Peth, Pune' },
   ],
   v3: [
     { id: 'r-v3-1', type: 'pickup', category: 'College Canteen', name: 'COEP Technological University', area: 'Shivajinagar', detail: '18 kg (Mixed Meal)', lat: 18.5308, lng: 73.8474, address: 'Wellesley Road, Shivajinagar' },
     { id: 'r-v3-2', type: 'drop', category: 'Public Hospital', name: 'Sancheti Relief Center', area: 'Shivajinagar', detail: '45 meal packets', lat: 18.5302, lng: 73.8502, address: 'Shivajinagar, Pune' },
-    { id: 'r-v3-3', type: 'drop', category: 'Community Shelter', name: 'Tadiwala Road Community Center', area: 'Tadiwala Road', detail: '30 meal packets', lat: 18.5166, lng: 73.8699, address: 'Tadiwala Road' },
+    { id: 'r-v3-3', type: 'pickup', category: 'Local Dhaba', name: 'Roopali Dhaba', area: 'FC Road', detail: '18 kg (Dal/Curry)', lat: 18.5236, lng: 73.8397, address: 'FC Road, Shivajinagar' },
+    { id: 'r-v3-4', type: 'drop', category: 'Community Shelter', name: 'Tadiwala Road Community Center', area: 'Tadiwala Road', detail: '30 meal packets', lat: 18.5166, lng: 73.8699, address: 'Tadiwala Road' },
   ],
   v4: [
     { id: 'r-v4-1', type: 'pickup', category: 'Bakery', name: 'German Bakery', area: 'Koregaon Park', detail: '25 kg (Breads & Rolls)', lat: 18.5345, lng: 73.8952, address: 'North Main Road, Koregaon Park' },

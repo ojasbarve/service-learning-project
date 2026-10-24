@@ -5,6 +5,16 @@ import { USERS } from './users';
 
 const AppCtx = createContext(null);
 
+function keepRouteDemoCoherent(nextRoutes) {
+  const repaired = { ...nextRoutes };
+  for (const [volunteerId, fallback] of Object.entries(fallbackRoutes)) {
+    const live = repaired[volunteerId];
+    const hasDropOnlyData = live?.some(stop => stop.type === 'drop') && !live.some(stop => stop.type === 'pickup');
+    if (hasDropOnlyData) repaired[volunteerId] = fallback;
+  }
+  return repaired;
+}
+
 export function AppProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(USERS.ops[0]);
   const [listings, setListings] = useState(fallbackListings);
@@ -28,7 +38,7 @@ export function AppProvider({ children }) {
       ]);
       setListings(nextListings); setVolunteers(nextVolunteers); setSuppliers(nextSuppliers); setDeliverySpots(nextSpots);
       const nextRoutes = await api.volunteerRoutes();
-      setRoutes(nextRoutes); setError(''); setLastSyncedAt(new Date());
+      setRoutes(keepRouteDemoCoherent(nextRoutes)); setError(''); setLastSyncedAt(new Date());
     } catch (err) { setError(err.message); }
     finally { setLoading(false); setRefreshing(false); refreshInFlight.current = false; }
   }, []);

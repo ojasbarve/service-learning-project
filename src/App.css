@@ -42,6 +42,9 @@
 .landing-hero h1 span { color:#8f3424; }
 .landing-lede { max-width:560px; color:#fff4e9; font-size:1.05rem; line-height:1.65; }
 .landing-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; }
+.landing-role-links { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:16px; color:rgba(255,244,233,.82); font-size:.76rem; font-weight:650; }
+.landing-role-links button { padding:0; border:0; border-bottom:1px solid rgba(255,255,255,.5); background:transparent; color:#fff9f1; cursor:pointer; font:inherit; }
+.landing-role-links button:hover { border-bottom-color:#fff9f1; }
 .landing-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 18px; border:0; border-radius:12px; cursor:pointer; font-size:.88rem; font-weight:750; }
 .landing-button-light { background:#fff9f1; color:#9a3928; box-shadow:0 10px 24px rgba(96,32,19,.13); }
 .landing-button-quiet { background:rgba(255,255,255,.13); color:#fff9f1; border:1px solid rgba(255,255,255,.3); }

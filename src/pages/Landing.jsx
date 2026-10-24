@@ -2,6 +2,7 @@ import { ArrowRight, CheckCircle2, Clock3, HeartHandshake, MapPin, PackageCheck,
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/layout/TopBar';
 import { useApp } from '../context/AppContext';
+import { USERS } from '../context/users';
 
 const steps = [
   { icon: UtensilsCrossed, number: '01', title: 'A partner logs surplus', text: 'Food donors share what is ready, how much is available, and the safe pickup window.' },
@@ -11,7 +12,12 @@ const steps = [
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { listings, volunteers, suppliers } = useApp();
+  const { listings, volunteers, suppliers, setCurrentUser } = useApp();
+  const openRole = role => {
+    const roleKey = role === 'ops' ? 'ops' : role === 'supplier' ? 'suppliers' : 'volunteers';
+    setCurrentUser(USERS[roleKey][0]);
+    navigate(role === 'ops' ? '/ops/overview' : role === 'supplier' ? '/supplier/log' : '/volunteer/available');
+  };
   const availableCount = listings.filter(listing => listing.status === 'Available').length;
   const activeVolunteers = volunteers.filter(volunteer => volunteer.status !== 'Offline').length;
   const partnerCount = suppliers.length;
@@ -28,8 +34,14 @@ export default function Landing() {
               <h1>Rescue food.<br /><span>Coordinate care.</span><br />Feed Pune.</h1>
               <p className="landing-lede">Nourish.Net gives Sevadeep partners one calm, accountable place to move safe surplus food from kitchens to the people who need it.</p>
               <div className="landing-actions">
-                <button className="landing-button landing-button-light" onClick={() => navigate('/supplier/log')}>Log surplus <ArrowRight size={17} /></button>
-                <button className="landing-button landing-button-quiet" onClick={() => navigate('/volunteer/available')}>Join the pickup queue</button>
+                <button className="landing-button landing-button-light" onClick={() => openRole('supplier')}>Log surplus <ArrowRight size={17} /></button>
+                <button className="landing-button landing-button-quiet" onClick={() => openRole('volunteer')}>Join the pickup queue</button>
+              </div>
+              <div className="landing-role-links" aria-label="Choose a demo workspace">
+                <span>Open demo as</span>
+                <button type="button" onClick={() => openRole('supplier')}>Supplier</button>
+                <button type="button" onClick={() => openRole('volunteer')}>Volunteer</button>
+                <button type="button" onClick={() => openRole('ops')}>Coordinator</button>
               </div>
               <div className="landing-trust-row">
                 <span><ShieldCheck size={16} /> Built around verified coordination</span>

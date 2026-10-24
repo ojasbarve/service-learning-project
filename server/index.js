@@ -85,24 +85,65 @@ async function claimListing(req, res, listingId) {
 }
 
 async function route(req, res, volunteerId) {
-  const [rows] = await db().query('SELECT * FROM route_stops WHERE volunteer_id=:volunteerId AND (listing_id IS NULL OR listing_id IN (SELECT id FROM surplus_listings WHERE deadline > NOW())) ORDER BY sequence_order', { volunteerId });
-  return sendJson(res, 200, rows.map(normalizeStop));
+  const [rows] = await db().query(`SELECT rs.*, s.name supplier_name, s.area supplier_area, s.type supplier_type, l.food_type, l.quantity_kg, l.address listing_address, l.lat listing_lat, l.lng listing_lng
+    FROM route_stops rs LEFT JOIN surplus_listings l ON l.id=rs.listing_id LEFT JOIN suppliers s ON s.id=l.supplier_id
+    WHERE rs.volunteer_id=:volunteerId AND (rs.listing_id IS NULL OR l.deadline > NOW()) ORDER BY rs.sequence_order`, { volunteerId });
+  return sendJson(res, 200, repairRoutePairs(rows).map(normalizeStop));
 }
 
 async function allRoutes(req, res) {
-  const [rows] = await db().query('SELECT * FROM route_stops WHERE listing_id IS NULL OR listing_id IN (SELECT id FROM surplus_listings WHERE deadline > NOW()) ORDER BY volunteer_id, sequence_order');
+  const [rows] = await db().query(`SELECT rs.*, s.name supplier_name, s.area supplier_area, s.type supplier_type, l.food_type, l.quantity_kg, l.address listing_address, l.lat listing_lat, l.lng listing_lng
+    FROM route_stops rs LEFT JOIN surplus_listings l ON l.id=rs.listing_id LEFT JOIN suppliers s ON s.id=l.supplier_id
+    WHERE rs.listing_id IS NULL OR l.deadline > NOW() ORDER BY rs.volunteer_id, rs.sequence_order`);
   const routes = {};
-  for (const row of rows) {
+  for (const row of repairRoutePairs(rows)) {
     if (!routes[row.volunteer_id]) routes[row.volunteer_id] = [];
     routes[row.volunteer_id].push(normalizeStop(row));
   }
   return sendJson(res, 200, { routes });
 }
 
+// Older demo imports occasionally contained a drop without its pickup row.
+// Keep the data read-only and repair the presentation from the linked listing.
+function repairRoutePairs(rows) {
+  const byListing = new Map();
+  for (const row of rows) {
+    if (row.listing_id) {
+      if (!byListing.has(row.listing_id)) byListing.set(row.listing_id, []);
+      byListing.get(row.listing_id).push(row);
+    }
+  }
+  const repaired = [...rows];
+  for (const [listingId, pair] of byListing) {
+    if (pair.some(row => row.type === 'pickup')) continue;
+    const drop = pair.find(row => row.type === 'drop');
+    if (!drop || drop.listing_lat == null) continue;
+    repaired.push({
+      ...drop,
+      id: `demo-pickup-${listingId}`,
+      type: 'pickup',
+      category: drop.supplier_type || 'Food partner',
+      name: drop.supplier_name || 'Food partner',
+      area: drop.supplier_area || drop.area,
+      detail: `${Number(drop.quantity_kg)} kg (${drop.food_type || 'Surplus food'})`,
+      address: drop.listing_address || drop.address,
+      lat: drop.listing_lat,
+      lng: drop.listing_lng,
+      sequence_order: Number(drop.sequence_order) - 0.1,
+    });
+  }
+  return repaired.sort((a, b) => Number(a.sequence_order) - Number(b.sequence_order));
+}
+
 async function removeRouteStop(req, res, stopId) {
   const result = await withTransaction(async connection => {
     const [rows] = await connection.query('SELECT * FROM route_stops WHERE id=:stopId FOR UPDATE', { stopId });
-    const stop = rows[0];
+    let stop = rows[0];
+    if (!stop && String(stopId).startsWith('demo-pickup-')) {
+      const listingId = String(stopId).replace(/^demo-pickup-/, '');
+      const [linked] = await connection.query('SELECT * FROM route_stops WHERE listing_id=:listingId ORDER BY sequence_order FOR UPDATE', { listingId });
+      stop = linked[0];
+    }
     if (!stop) return { status: 404, body: { error: 'Route stop not found' } };
     if (stop.status === 'Completed') return { status: 409, body: { error: 'Completed stops cannot be removed' } };
 

@@ -11,7 +11,7 @@ const roles = [
 export default function TopBar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { setCurrentUser } = useApp();
+  const { currentUser, setCurrentUser } = useApp();
 
   const activeRole = roles.find(r => pathname.startsWith(r.path)) ?? null;
 
@@ -33,8 +33,13 @@ export default function TopBar() {
               <button className={`app-role-button${isActive ? ' active' : ''}`}
                 key={role.path}
                 onClick={() => {
-                  const roleKey = role.path.slice(1) === 'ops' ? 'ops' : role.path.slice(1);
-                  setCurrentUser(USERS[roleKey][0]);
+                  const roleKey = role.path.slice(1) === 'ops' ? 'ops' : `${role.path.slice(1)}s`;
+                  // Ops can inspect the other portals without changing the logged-in
+                  // coordinator identity. Supplier/volunteer users can still enter the
+                  // Ops demo persona from the same switcher.
+                  if (currentUser?.role !== 'ops' || roleKey === 'ops') {
+                    setCurrentUser(USERS[roleKey][0]);
+                  }
                   navigate(role.path);
                 }}
               >

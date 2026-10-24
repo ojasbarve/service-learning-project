@@ -16,7 +16,6 @@ export default function SupplierLayout() {
   const { pathname } = useLocation();
   const { currentUser } = useApp();
   if (currentUser?.role === 'volunteer') return <Navigate to="/volunteer/available" replace />;
-  if (currentUser?.role === 'ops') return <Navigate to="/ops/overview" replace />;
   const sub = pathname.split('/').pop();
 
   let content;

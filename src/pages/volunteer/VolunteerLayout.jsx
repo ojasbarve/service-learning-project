@@ -18,7 +18,6 @@ export default function VolunteerLayout() {
   const { pathname } = useLocation();
   const { currentUser } = useApp();
   if (currentUser?.role === 'supplier') return <Navigate to="/supplier/log" replace />;
-  if (currentUser?.role === 'ops') return <Navigate to="/ops/overview" replace />;
   const sub = pathname.split('/').pop();
 
   let content;
