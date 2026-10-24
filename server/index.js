@@ -1,4 +1,4 @@
-import { db, withTransaction } from './db.js';
+import { db, closeDb, withTransaction } from './db.js';
 import { badRequest, methodNotAllowed, notFound, normalizeListing, normalizeStop, normalizeVolunteer, optimizeRouteStops, sendJson, serverError } from './utils.js';
 import { matchingSpot } from './utils.js';
 
@@ -302,4 +302,5 @@ export default async function handler(req, res) {
     }
     return methodNotAllowed(res, ['GET', 'POST']);
   } catch (error) { return serverError(res, error); }
+  finally { await closeDb().catch(() => {}); }
 }
