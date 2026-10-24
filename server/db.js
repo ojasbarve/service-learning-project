@@ -31,13 +31,6 @@ export function db() {
   return getPool();
 }
 
-export async function closeDb() {
-  if (!pool) return;
-  const activePool = pool;
-  pool = undefined;
-  await activePool.end();
-}
-
 export async function withTransaction(work) {
   const connection = await getPool().getConnection();
   try {
