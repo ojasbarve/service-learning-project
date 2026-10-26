@@ -66,23 +66,23 @@ Make sure you have [Node.js](https://nodejs.org/) installed (v18 or higher recom
    npm install
    ```
 
-3. Launch the frontend-only development server:
+3. Launch the local app and API together:
    ```bash
    npm run dev
    ```
 
 4. Open your browser at:
    ```
-   http://localhost:5173
+   http://localhost:3000
+
+   Use `npm run dev:frontend` only when you specifically want the frontend without database-backed API calls.
    ```
 
 ### Run the API locally
 
 The API is implemented as Vercel functions. Use Vercel's local runtime when you need database-backed routes:
 
-```bash
-npm run dev:api
-```
+The API is included when you run `npm run dev`; `npm run dev:api` remains available if you need to start the Vercel runtime separately.
 
 Create `.env` from `.env.example` and set a reachable MySQL `DATABASE_URL`. A local MySQL server works with `vercel dev`; it will not work after deployment because Vercel cannot reach your laptop's `localhost`.
 

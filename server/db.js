@@ -13,7 +13,8 @@ function getPool() {
       database: process.env.DATABASE_URL ? undefined : (process.env.DB_NAME || 'nourish_net_db'),
       waitForConnections: true,
       // FreeDB has a very small per-user connection cap; keep the demo pool conservative.
-      connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 1),
+      // FreeDB's account-wide cap is lower than a serverless deployment's default.
+      connectionLimit: 1,
       maxIdle: Number(process.env.DB_MAX_IDLE ?? 0),
       idleTimeout: Number(process.env.DB_IDLE_TIMEOUT || 60000),
       queueLimit: Number(process.env.DB_QUEUE_LIMIT || 0),

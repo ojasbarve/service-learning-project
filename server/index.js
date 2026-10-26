@@ -9,7 +9,12 @@ async function optimizePendingRoute(connection, volunteerId) {
     'SELECT * FROM route_stops WHERE volunteer_id=:volunteerId ORDER BY sequence_order FOR UPDATE',
     { volunteerId },
   );
-  const finalOrder = optimizeRouteStops(rows);
+  const optimizedOrder = optimizeRouteStops(rows);
+  // Keep any legacy/orphaned stops that the optimizer cannot pair. Dropping
+  // one here leaves its old sequence number in place and can collide with a
+  // newly claimed pickup during the second pass.
+  const optimizedIds = new Set(optimizedOrder.map(stop => stop.id));
+  const finalOrder = [...optimizedOrder, ...rows.filter(stop => !optimizedIds.has(stop.id))];
   for (let i = 0; i < finalOrder.length; i += 1) {
     await connection.query('UPDATE route_stops SET sequence_order=:nextOrder WHERE id=:id', { nextOrder: 200 + i, id: finalOrder[i].id });
   }
@@ -73,13 +78,24 @@ async function claimListing(req, res, listingId) {
     await connection.query('UPDATE volunteers SET status="En Route", last_update="Just now" WHERE id=:volunteerId', { volunteerId });
     const detail = `${Number(listing.quantity_kg)} kg (${listing.food_type})`;
     await connection.query(`INSERT INTO route_stops (id,volunteer_id,listing_id,type,category,name,area,detail,address,lat,lng,sequence_order,status) VALUES (:pickupId,:volunteerId,:listingId,'pickup',:category,:pickupName,:area,:detail,:address,:pickupLat,:pickupLng,:pickupOrder,'Pending'),(:dropId,:volunteerId,:listingId,'drop',:dropCategory,:dropName,:dropArea,:dropDetail,:dropAddress,:dropLat,:dropLng,:dropOrder,'Pending')`, {
-      pickupId: `r-p-${listingId}-${Date.now()}`, dropId: `r-d-${listingId}-${Date.now() + 1}`, volunteerId, listingId,
+      pickupId: `r-p-${listingId}`, dropId: `r-d-${listingId}`, volunteerId, listingId,
       category: listing.supplier_type, pickupName: listing.supplier_name, area: listing.supplier_area, detail, address: listing.address, pickupLat: listing.lat, pickupLng: listing.lng, pickupOrder: start,
       dropCategory: spot.type, dropName: spot.name, dropArea: spot.area, dropDetail: `${Math.round(Number(listing.quantity_kg) * 2.5)} meal packets`, dropAddress: `${spot.name}, ${spot.area}`, dropLat: spot.lat, dropLng: spot.lng, dropOrder: start + 1,
     });
     await optimizePendingRoute(connection, volunteerId);
     const [updated] = await connection.query(`${listingSelect} WHERE l.id=:id`, { id: listingId });
-    return { status: 200, body: { listing: normalizeListing(updated[0]), volunteer: normalizeVolunteer({ ...volunteer, status: 'En Route', last_update: 'Just now' }), route: [] } };
+    const [routeRows] = await connection.query(`SELECT rs.*
+      FROM route_stops rs
+      WHERE rs.volunteer_id=:volunteerId
+      ORDER BY rs.sequence_order`, { volunteerId });
+    return {
+      status: 200,
+      body: {
+        listing: normalizeListing(updated[0]),
+        volunteer: normalizeVolunteer({ ...volunteer, status: 'En Route', last_update: 'Just now' }),
+        route: routeRows.map(normalizeStop),
+      },
+    };
   });
   return sendJson(res, result.status, result.body);
 }

@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["bom1"],
   "rewrites": [
     { "source": "/((?!api/|src/|node_modules/|@vite/|@react-refresh|assets/|favicon\\.svg|icons\\.svg).*)", "destination": "/" }
   ]

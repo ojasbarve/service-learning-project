@@ -1,8 +1,8 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
-async function request(path, options = {}) {
+async function request(path, { timeoutMs = 10000, ...options } = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   let response;
   try {
     response = await fetch(`${API_BASE}${path}`, {
@@ -36,12 +36,12 @@ export const api = {
   bootstrap: () => request('/bootstrap'),
   health: () => request('/health'),
   listings: (params = {}) => request(`/listings?${new URLSearchParams(params)}`).then(body => asArray(body, 'listings')),
-  createListing: data => request('/listings', { method: 'POST', body: JSON.stringify(data) }),
-  claimListing: (id, volunteerId) => request(`/listings/${id}/claim`, { method: 'POST', body: JSON.stringify({ volunteerId }) }),
+  createListing: data => request('/listings', { method: 'POST', body: JSON.stringify(data), timeoutMs: 30000 }),
+  claimListing: (id, volunteerId) => request(`/listings/${id}/claim`, { method: 'POST', body: JSON.stringify({ volunteerId }), timeoutMs: 30000 }),
   volunteers: () => request('/volunteers').then(body => asArray(body, 'volunteers')),
   volunteerRoute: id => request(`/volunteers/${id}/route`).then(body => asArray(body, 'route')),
   volunteerRoutes: () => request('/routes').then(body => body?.routes || {}),
-  removeRouteStop: id => request(`/routes/${id}`, { method: 'DELETE' }),
+  removeRouteStop: id => request(`/routes/${id}`, { method: 'DELETE', timeoutMs: 30000 }),
   suppliers: () => request('/suppliers').then(body => asArray(body, 'suppliers')),
   deliverySpots: () => request('/delivery-spots').then(body => asArray(body, 'deliverySpots')),
   overview: () => request('/ops/overview'),

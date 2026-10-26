@@ -7,6 +7,11 @@ import { format } from 'date-fns';
 
 const foodTypes = ['Cooked Rice', 'Dal/Curry', 'Biryani', 'Bread/Roti', 'Snacks', 'Mixed Meal', 'Bakery Items', 'Other'];
 
+function defaultDeadline() {
+  const deadline = new Date(Date.now() + 3 * 60 * 60 * 1000);
+  return `${String(deadline.getHours()).padStart(2, '0')}:${String(deadline.getMinutes()).padStart(2, '0')}`;
+}
+
 export default function LogSurplus() {
   const { currentUser, listings, suppliers, addListing } = useApp();
   const [formError, setFormError] = useState('');
@@ -25,7 +30,7 @@ export default function LogSurplus() {
     foodType: '',
     quantity: '',
     availableFrom: '09:00',
-    deadline: '14:00',
+    deadline: defaultDeadline(),
     address: activeSupplier.address,
     notes: '',
   });
@@ -93,7 +98,7 @@ export default function LogSurplus() {
         foodType: '',
         quantity: '',
         availableFrom: '09:00',
-        deadline: '14:00',
+        deadline: defaultDeadline(),
         address: activeSupplier.address,
         notes: '',
       });
